@@ -1,0 +1,16 @@
+{
+    "name": "Hexen.BoardSystem",
+    "rootNamespace": "",
+    "references": [
+        "GUID:077c0b96cb4cdf749b9348b9fb625da0"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
