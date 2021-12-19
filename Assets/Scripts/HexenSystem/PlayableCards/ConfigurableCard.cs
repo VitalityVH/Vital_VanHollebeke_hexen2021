@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Hexen.HexenSystem.PlayableCards
 {
-    class ConfigurableCard<TPosition> : CardBase<TPosition>
+    class ConfigurableCard<TPosition> : CardBase<TPosition> where TPosition : IPosition
     {
         public delegate List<TPosition>
             PositionsCollector(Board<Capsule<TPosition>, TPosition> board, Grid<TPosition> grid, Capsule<TPosition> capsule);
@@ -16,11 +16,6 @@ namespace Hexen.HexenSystem.PlayableCards
             _collectPositions = positionsCollector;
         }
 
-        public override bool CanExecute(CardBase<TPosition> card)
-        {
-            throw new System.NotImplementedException();
-        }
-
         public override void Execute(CardBase<TPosition> card, TPosition position)
         {
             throw new System.NotImplementedException();
@@ -28,8 +23,5 @@ namespace Hexen.HexenSystem.PlayableCards
 
         public override List<TPosition> Positions(Capsule<TPosition> capsule, CardBase<TPosition> card)
             => _collectPositions(Board, Grid, capsule);
-
-
-        
     }
 }

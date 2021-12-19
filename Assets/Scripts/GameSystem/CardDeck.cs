@@ -9,11 +9,11 @@ namespace Hexen.HexenSystem
     public class CardDeck<TPosition> : MonoBehaviour
     {
         [SerializeField] private GameObject _cardDisplay;
-        [SerializeField] private int _handSize = 13;
+        [SerializeField] private int _deckSize = 13;
         
         private List<PlayableCardName> _cardNames;
-        public Board<Capsule<TPosition>, TPosition> Board;
-        public Grid<TPosition> Grid;
+        private Board<Capsule<TPosition>, TPosition> _board;
+        private Grid<TPosition> _grid;
 
         void Start()
         {
@@ -23,7 +23,7 @@ namespace Hexen.HexenSystem
 
         private void PopulateDeck()
         {
-            for (int i = 0; i < _handSize; i++)
+            for (int i = 0; i < _deckSize; i++)
             {
                 GenerateCard();
             }

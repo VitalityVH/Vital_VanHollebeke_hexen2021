@@ -1,23 +1,14 @@
-﻿using Hexen.HexenSystem;
+﻿using System;
+using Hexen.BoardSystem;
+using Hexen.HexenSystem;
 using UnityEngine;
 
 namespace Hexen.GameSystem
 {
     public class CapsuleView : MonoBehaviour
     {
-        #region Properties
-
         private Capsule<HexTile> model;
-
-        #endregion
-
-        #region Fields
-
-        [SerializeField] private CapsuleType _capsuleType;
-
-        #endregion
         public Capsule<HexTile> Model
-            
         {
             get => model;
 
@@ -25,9 +16,9 @@ namespace Hexen.GameSystem
             {
                 if (model != null)
                 {
+                    model.Teleported -= OnCapsuleTeleported;
                     model.Hit -= OnCapsuleHit;
                     model.Pushed -= OnCapsulePushed;
-                    model.Teleported -= OnCapsuleTeleported;
 
                     //     model.ActivationStatusChanged -= OnPieceActivationChanged;
                 }
@@ -36,15 +27,13 @@ namespace Hexen.GameSystem
 
                 if (model != null)
                 {
+                    model.Teleported += OnCapsuleTeleported;
                     model.Hit += OnCapsuleHit;
                     model.Pushed += OnCapsulePushed;
-                    model.Teleported += OnCapsuleTeleported;
                     //     model.ActivationStatusChanged += OnPieceActivationChanged;
                 }
             }
         }
-
-        public CapsuleType CapsuleType => _capsuleType;
 
         private void OnCapsuleHit(object sender, CapsuleEventArgs<HexTile> eventArgs)
         {
@@ -58,9 +47,7 @@ namespace Hexen.GameSystem
 
         private void OnCapsuleTeleported(object sender, CapsuleEventArgs<HexTile> eventArgs)
         {
-
+            gameObject.transform.position = eventArgs.Position.transform.position;
         }
-
-
     }
 }

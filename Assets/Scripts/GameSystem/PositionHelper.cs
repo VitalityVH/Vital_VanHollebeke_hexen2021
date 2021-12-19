@@ -1,4 +1,5 @@
 ﻿using Hexen.BoardSystem;
+using Hexen.HexenSystem;
 using UnityEngine;
 
 namespace Hexen.GameSystem
@@ -18,19 +19,21 @@ namespace Hexen.GameSystem
         }
 
         #region Methods
-        public Vector3 HexTileToWorldPos(HexTile hex)
+        public Vector3 HexTileToWorldPos((int q, int r) hex)
         {
-            float x = _tileDimension * Mathf.Sqrt(3) * hex.Q + Mathf.Sqrt(3) / 2 * hex.R;
-            float y = _tileDimension * 3 / 2 * hex.R;
+            float x = _tileDimension * Mathf.Sqrt(3) * hex.q + Mathf.Sqrt(3) / 2 * hex.r;
+            float y = _tileDimension * 3 / 2 * hex.r;
 
             return new Vector3(x,0,y);
         }
 
-        // public (int x, int y) WorldToGridPosition(Board<IPlayableCard, IPosition> board ,Grid<HexTile> grid, Vector3 worldPos)
+        // public (int x, int y) WorldToGridPosition(Board<Capsule<IPosition>,IPosition> board ,Grid<HexTile> grid, Vector3 worldPos)
         // {
         //     var scaledWorldPos = worldPos / _tileDimension;
         //     return default;
         // }
+
+
         #endregion
     }
 }

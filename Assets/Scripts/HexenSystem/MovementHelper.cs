@@ -1,21 +1,22 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Hexen.BoardSystem;
+using Hexen.HexenSystem.PlayableCards;
 
 namespace Hexen.HexenSystem
 {
-    internal class MovementHelper<TPosition>
+    internal class MovementHelper<TPosition> 
     {
         private Board<Capsule<TPosition>, TPosition> _board;
         private Grid<TPosition> _grid;
-        private Capsule<TPosition> _capsule;
+        private CardBase<TPosition> _card;
         private List<TPosition> _validPositions = new List<TPosition>();
 
-        public MovementHelper(Board<Capsule<TPosition>, TPosition> board, Grid<TPosition> grid, Capsule<TPosition> capsule)
+        public MovementHelper(Board<Capsule<TPosition>, TPosition> board, Grid<TPosition> grid, CardBase<TPosition> card)
         {
             _board = board;
             _grid = grid;
-            _capsule = capsule;
+            _card = card;
         }
 
         public MovementHelper<TPosition> Left(int maxSteps = int.MaxValue, params Validator[] validators)
@@ -43,7 +44,7 @@ namespace Hexen.HexenSystem
 
         public MovementHelper<TPosition> Collect(int xOffset, int yOffset, int maxSteps = int.MaxValue, params Validator[] validators)
         {
-            if (!_board.TryGetPosition(_capsule, out var currentPosition))
+            if (!_board.TryGetPosition(_board.HeroCapsule, out var currentPosition))
                 return this;
 
             if (!_grid.TryGetCoordinateAt(currentPosition, out var currentCoordinates))
@@ -55,7 +56,7 @@ namespace Hexen.HexenSystem
             _grid.TryGetPositionAt(nextCoordinateX, nextCoordinateY, out var nextHexTile);
             var steps = 0;
 
-            while (steps < maxSteps && nextHexTile != null && validators.All((v) => v(_board, _grid, _capsule, nextHexTile)))
+            while (steps < maxSteps && nextHexTile != null && validators.All((v) => v(_board, _grid, _board.HeroCapsule, nextHexTile)))
             {
                 //var nextPiece = _board.PieceAt(nextPosition);
 
@@ -74,7 +75,7 @@ namespace Hexen.HexenSystem
 
         public MovementHelper<TPosition> ReturnAllHexTiles(params Validator[] validators)
         {
-            if (!_board.TryGetPosition(_capsule, out var currentPosition))
+            if (!_board.TryGetPosition(_board.HeroCapsule, out var currentPosition))
                 return this;
             if (!_grid.TryGetCoordinateAt(currentPosition, out var currentCoordinates))
                 return this;
@@ -83,7 +84,7 @@ namespace Hexen.HexenSystem
 
             foreach (var hexPosition in allHexPositions)
             {
-                if (validators.All((v) => v(_board, _grid, _capsule, hexPosition.Key)))
+                if (validators.All((v) => v(_board, _grid, _board.HeroCapsule, hexPosition.Key)))
                 {
                     _validPositions.Add(hexPosition.Key);
                 }

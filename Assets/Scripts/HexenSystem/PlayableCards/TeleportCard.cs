@@ -1,32 +1,31 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Hexen.BoardSystem;
 using UnityEngine;
 
 namespace Hexen.HexenSystem.PlayableCards
 {
-    public class TeleportCard<TPosition> : CardBase<TPosition>
+    public class TeleportCard<TPosition> : CardBase<TPosition> 
     {
-        public TeleportCard(Board<Capsule<TPosition>, TPosition> board, Grid<TPosition> grid) : base(board, grid)
-        {
-        }
-        // Description = "The player can teleport to a free hexTile";
-        // PlayableCardName = PlayableCardName.Teleport;
+        public delegate List<TPosition>
+            PositionsCollector(Board<Capsule<TPosition>, TPosition> board, Grid<TPosition> grid, CardBase<TPosition> card);
 
-        public override bool CanExecute(CardBase<TPosition> card)
-        {
-            return true;
-        }
+        private PositionsCollector _collectPositions;
 
-        public override void Execute(CardBase<TPosition> card, TPosition position)
+        public TeleportCard(Board<Capsule<TPosition>, TPosition> board, Grid<TPosition> grid, PositionsCollector positionsCollector) : base(board, grid)
         {
-            throw new System.NotImplementedException();
+            Description = "Teleports the hero capsule to a available hexTile";
+            PlayableCardName = PlayableCardName.Teleport;
+            _collectPositions = positionsCollector;
         }
 
-        public override List<TPosition> Positions(Capsule<TPosition> capsule, CardBase<TPosition> card)
+        public override void Execute(TPosition atPosition)
         {
-            throw new System.NotImplementedException();
+            Board.Teleport(atPosition);
         }
 
-        
+        public override List<TPosition> Positions(CardBase<TPosition> card)
+            => _collectPositions(Board, Grid, card);
+
     }
 }

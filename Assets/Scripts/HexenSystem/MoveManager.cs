@@ -6,28 +6,30 @@ using Hexen.Plugins;
 
 namespace Hexen.HexenSystem
 {
-    public class MoveManager<TPosition>
-        where TPosition : IPosition
+    public class MoveManager<TPosition> where TPosition : IPosition
     {
         private Board<Capsule<TPosition>, TPosition> _board;
         private Grid<TPosition> _grid;
 
-        public MultiValueDictionary<PlayableCardName, IMove<TPosition>> _cardMoves;
+        public List<ICard<TPosition>> _cardMoves = new List<ICard<TPosition>>();
 
         public MoveManager(Board<Capsule<TPosition>, TPosition> board, Grid<TPosition> grid)
         {
             _board = board;
+            _board.CapsuleTeleported += (s, e) => e.Capsule.TeleportTo(e.ToPosition);
+
+
             _grid = grid;
 
-            _cardMoves.Add(PlayableCardName.Teleport,
-                new ConfigurableCard<TPosition>(board, grid, (b,g,c) 
+            _cardMoves.Add(
+                new TeleportCard<TPosition>(board, grid, (b,g,c) 
                     => new MovementHelper<TPosition>(b,g,c)
                         .ReturnAllHexTiles(MovementHelper<TPosition>.Empty)
                         .CollectValidPositions()));
 
             //Swipe en pushback zijn drie tile rond de speler
-            _cardMoves.Add(PlayableCardName.Pushback,
-                new ConfigurableCard<TPosition>(board, grid, (b, g, c)
+            _cardMoves.Add(
+                new SwipeCard<TPosition>(board, grid, (b, g, c)
                     => new MovementHelper<TPosition>(b, g, c)
                         .Left(1)
                         .TopLeft(1)
@@ -38,8 +40,8 @@ namespace Hexen.HexenSystem
                         .CollectValidPositions()));
 
 
-            _cardMoves.Add(PlayableCardName.Swipe,
-                new ConfigurableCard<TPosition>(board, grid, (b, g, c)
+            _cardMoves.Add(
+                new PushCard<TPosition>(board, grid, (b, g, c)
                     => new MovementHelper<TPosition>(b, g, c)
                         .Left(1)
                         .TopLeft(1)
@@ -50,39 +52,40 @@ namespace Hexen.HexenSystem
                         .CollectValidPositions()));
 
             //Slash is alle richtingen tot einde board
-            _cardMoves.Add(PlayableCardName.Slash,
-                new ConfigurableCard<TPosition>(board,grid,(b,g,c)
+            _cardMoves.Add(
+                new SlashCard<TPosition>(board,grid,(b,g,c)
                     => new MovementHelper<TPosition>(b,g,c)
-                        .Left(_grid.Radius*2)
-                        .TopLeft(_grid.Radius * 2)
-                        .BottomLeft(_grid.Radius * 2)
-                        .Right(_grid.Radius * 2)
-                        .TopRight(_grid.Radius * 2)
-                        .BottomRight(_grid.Radius * 2)
+                        .Left()
+                        .TopLeft()
+                        .BottomLeft()
+                        .Right()
+                        .TopRight()
+                        .BottomRight()
                         .CollectValidPositions()));
         }
 
 
-        public List<TPosition> ValidPositionFor(Capsule<TPosition> capsule, CardBase<TPosition> card)
+        public List<TPosition> ValidPositionFor(CardBase<TPosition> card)
         {
-            return _cardMoves[card.PlayableCardName]
+            return _cardMoves
                 .Where((m) => m.CanExecute(card))
-                .SelectMany((m) => m.Positions(capsule,card))
+                .SelectMany((m) => m.Positions(card))
                 .ToList();
-            //get all [executable moves]
-            //foreach move
-            //   [get/collect positions]
-            //return positions
+
+            // return _cardMoves[capsule.CapsuleType]
+            //     .Where((m) => m.CanExecute(capsule))
+            //     .SelectMany((m) => m.Positions(capsule))
+            //     .ToList();
         }
 
-        public void Move(Capsule<TPosition> capsule, TPosition position, CardBase<TPosition> card)
+        public void Teleport(CardBase<TPosition> card, TPosition position)
         {
-            var move = _cardMoves[card.PlayableCardName]
+            var move = _cardMoves
                 .Where(m => m.CanExecute(card))
-                .Where(m => m.Positions(capsule, card).Contains(position))
+                .Where(m => m.Positions(card).Contains(position))
                 .First();
 
-            move.Execute(card, position);
+            move.Execute(position);
             //get first moves
             //waarvan positie deel uit maakt van zijn valid moves
             //en [voer uit]

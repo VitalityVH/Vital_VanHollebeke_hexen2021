@@ -33,7 +33,6 @@ namespace Hexen.SelectionSystem
             
             if (_selectedItems.Add(selectableItem))
             {
-                Debug.Log($"Amount of selected tiles {_selectedItems.Count}");
                 OnSelected(new SelectionEventArgs<TSelectableItem>(selectableItem));
                 return true;
             }
