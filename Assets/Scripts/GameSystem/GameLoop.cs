@@ -49,28 +49,24 @@ namespace Hexen.GameSystem
                 _grid.TryGetCoordinateAt(_selectionManager.SelectedItem, out var coordinate);
                 // _board.Teleport(_selectionManager.SelectedItem);
 
-                // _selectionManager.SelectedItem.Highlight = true;
+                _selectionManager.SelectedItem.Highlight = true;
             };
 
-            // _selectionManager.Deselected += (source, eventArgs) =>
-            // {
-            //     _selectionManager.SelectedItem.Highlight = false;
-            // };
+            _selectionManager.Deselected += (source, eventArgs) =>
+            {
+                eventArgs.SelectionItem.Highlight = false;
+            };
 
             _board.CapsuleTeleported += (source, eventArgs) =>
             {
                 
             };
 
-
             GenerateGrid();
             GenerateHero();
             GenerateEnemies();
             GenerateHand(PopulateDeck());
         }
-
-        public void DeselectAll()
-            => _selectionManager.DeselectAll();
 
         private void GenerateGrid()
         {
@@ -90,6 +86,9 @@ namespace Hexen.GameSystem
                     newHexTile.Q = q;
                     newHexTile.R = r;
                     newHexTile.S = -q - r;
+
+                    newHexTile.CardEntered += (source, EventArgs) => Select(EventArgs.HexTile);
+                    newHexTile.CardExited += (source, EventArgs) => Deselect(EventArgs.HexTile);
 
                     newHexTile.Dropped += (source, eventArgs)
                         => Select(eventArgs.HexTile);
@@ -125,9 +124,9 @@ namespace Hexen.GameSystem
                 newHeroCapsuleView.Model = newHeroCapsule;
                 newHeroCapsule.HexTile = middleHexTile;
                 newHeroCapsule.CapsuleType = CapsuleType.Hero;
-
-                newHeroCapsule.Teleported += (source, eventArgs)
-                    => Teleport(eventArgs.Position);
+                //
+                // newHeroCapsule.Teleported += (source, eventArgs)
+                //     => Teleport(eventArgs.Position);
 
                 _board.HeroCapsule = newHeroCapsule;
                 _board.Place(newHeroCapsule, newHeroCapsule.HexTile);
@@ -160,79 +159,76 @@ namespace Hexen.GameSystem
             }
         }
 
-        private List<CardBase<HexTile>> PopulateDeck()
+        private List<ICard<HexTile>> PopulateDeck()
         {
-            List<CardBase<HexTile>> deckCards = new List<CardBase<HexTile>>();
+            List<ICard<HexTile>> deckCards = new List<ICard<HexTile>>();
 
             for (int i = 0; i < _deckSize; i++)
             {
-                deckCards.Add(GenerateCard());
+                // deckCards.Add(GenerateCard());
             }
 
             return deckCards;
         }
 
-        private void GenerateHand(List<CardBase<HexTile>> deckCards)
+        private void GenerateHand(List<ICard<HexTile>> deckCards)
         {
             for (int i = 0; i < 5; i++)
             {
-                var newCardDisplay = Instantiate(_cardDisplay, _deckHand.transform);
-                newCardDisplay.GetComponent<CardDisplay>().Canvas = FindObjectOfType<Canvas>();
-                newCardDisplay.GetComponent<CardDisplay>().Card = deckCards[_deckSize-1];
-
-                newCardDisplay.GetComponent<CardDisplay>().Dragging += (source, args) =>
-                {
-                    // if (args.pointerCurrentRaycast.gameObject.GetComponentInParent<HexTile>() != null)
-                    // {
-                    //     Select(args.pointerCurrentRaycast.gameObject.GetComponentInParent<HexTile>());
-                    // }
-                    
-                };
-
-                newCardDisplay.GetComponent<CardDisplay>().UsedCard += (source, args) =>
-                {
-                    Debug.Log($"Used {args.Card.PlayableCardName}");
-                };
-
-                _deckSize--;
-
-                Debug.Log(newCardDisplay.GetComponent<CardDisplay>().Card.PlayableCardName);
+                // var newCardDisplay = Instantiate(_cardDisplay, _deckHand.transform);
+                // newCardDisplay.GetComponent<CardDisplay>().Canvas = FindObjectOfType<Canvas>();
+                // newCardDisplay.GetComponent<CardDisplay>().Card = deckCards[_deckSize-1];
+                //
+                // newCardDisplay.GetComponent<CardDisplay>().Dragging += (source, args) =>
+                // {
+                //     // if (args.pointerCurrentRaycast.gameObject.GetComponentInParent<HexTile>() != null)
+                //     // {
+                //     //     Select(args.pointerCurrentRaycast.gameObject.GetComponentInParent<HexTile>());
+                //     // }
+                //     
+                // };
+                //
+                // newCardDisplay.GetComponent<CardDisplay>().UsedCard += (source, args) =>
+                // {
+                //     Debug.Log($"Used {args.Card.PlayableCardName}");
+                // };
+                //
+                // _deckSize--;
+                //
+                // Debug.Log(newCardDisplay.GetComponent<CardDisplay>().Card.PlayableCardName);
             }
         }
 
-        private void Test(PointerEventData e)
-        {
-            GameObject obj = e.pointerCurrentRaycast.gameObject;
-            Debug.Log(obj.GetComponentInParent<HexTile>());
-        }
-
-        private CardBase<HexTile> GenerateCard()
-        {
-            switch (Random.Range(1, 5))
-            {
-                case 1:
-                    return new TeleportCard<HexTile>(_board, _grid);
-                case 2:
-                    return new SlashCard<HexTile>(_board, _grid);
-                case 3:
-                    return new SwipeCard<HexTile>(_board, _grid);
-                case 4:
-                    return new PushCard<HexTile>(_board, _grid);
-            }
-            return null;
-        }
+        // private ICard<HexTile> GenerateCard()
+        // {
+        //     switch (Random.Range(1, 5))
+        //     {
+        //         case 1:
+        //             return new TeleportCard<HexTile>(_board, _grid);
+        //         case 2:
+        //             return new SlashCard<HexTile>(_board, _grid);
+        //         case 3:
+        //             return new SwipeCard<HexTile>(_board, _grid);
+        //         case 4:
+        //             return new PushCard<HexTile>(_board, _grid);
+        //     }
+        //     return null;
+        // }
 
         private void Select(HexTile hexTile)
         {
-            DeselectAll();
             _selectionManager.Select(hexTile);
         }
 
-        private void Teleport(HexTile hexTile)
+        private void Deselect(HexTile hexTile)
         {
-            DeselectAll();
-            _selectionManager.Select(hexTile);
+            _selectionManager.Deselect(hexTile);
         }
+
+        // private void Teleport(HexTile hexTile)
+        // {
+        //     _selectionManager.Select(hexTile);
+        // }
         #endregion
 
     }

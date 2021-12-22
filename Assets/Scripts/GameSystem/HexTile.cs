@@ -16,13 +16,35 @@ namespace Hexen.GameSystem
         }
     }
 
-    public class HexTile : MonoBehaviour, IDropHandler, HexenSystem.IPosition
+    public class CardEnterEventArgs : EventArgs
+    {
+        public HexTile HexTile { get; }
+
+        public CardEnterEventArgs(HexTile hexTile)
+        {
+            HexTile = hexTile;
+        }
+    }
+
+    public class CardExitEventArgs : EventArgs
+    {
+        public HexTile HexTile { get; }
+
+        public CardExitEventArgs(HexTile hexTile)
+        {
+            HexTile = hexTile;
+        }
+    }
+
+    public class HexTile : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerExitHandler, HexenSystem.IPosition
     {
         #region Fields
 
         public int Q, R, S;
         
         public event EventHandler<DropEventArgs> Dropped;
+        public event EventHandler<CardEnterEventArgs> CardEntered;
+        public event EventHandler<CardExitEventArgs> CardExited;
 
         [SerializeField] private UnityEvent OnActivate;
         [SerializeField] private UnityEvent OnDeactivate;
@@ -147,7 +169,6 @@ namespace Hexen.GameSystem
         {
             OnCardDrop(new DropEventArgs(this));
         }
-
         #endregion
 
         protected virtual void OnCardDrop(DropEventArgs tileEventArgs)
@@ -155,5 +176,38 @@ namespace Hexen.GameSystem
             var handler = Dropped;
             handler?.Invoke(this, tileEventArgs);
         }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            if (eventData.dragging)
+            {
+                OnCardEnter(new CardEnterEventArgs(this));
+                
+               Debug.Log($"Dragging over {this}");
+            }
+        }
+
+        protected virtual void OnCardEnter(CardEnterEventArgs cardEnterEventArgs)
+        {
+            var handler = CardEntered;
+            handler?.Invoke(this, cardEnterEventArgs);
+        }
+
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            if (eventData.dragging)
+            {
+                OnCardExit(new CardExitEventArgs(this));
+                Debug.Log($"Exited {this}");
+            }
+        }
+
+        protected virtual void OnCardExit(CardExitEventArgs cardExitEventArgs)
+        {
+            var handler = CardExited;
+            handler?.Invoke(this, cardExitEventArgs);
+        }
+
     }
 }

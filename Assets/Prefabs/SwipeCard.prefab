@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4127589958829167456}
   - component: {fileID: 4127589958829167457}
   m_Layer: 5
-  m_Name: CardDisplay
+  m_Name: SwipeCard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -89,7 +89,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4127589958829167460}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 52c1c765d31dfae4eb0136d091b8cb63, type: 3}
+  m_Script: {fileID: 11500000, guid: d684c962926c7264195f02a461c8c50b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _image: {fileID: 7509306398869871835}

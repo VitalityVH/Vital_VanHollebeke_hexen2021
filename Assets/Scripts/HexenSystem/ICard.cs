@@ -5,8 +5,8 @@ namespace Hexen.HexenSystem
 {
     public interface ICard<TPosition>
     {
-        bool CanExecute(CardBase<TPosition> card);
+        bool CanExecute();
         void Execute(TPosition atPosition);
-        List<TPosition> Positions(CardBase<TPosition> card);
+        List<TPosition> Positions();
     }
 }

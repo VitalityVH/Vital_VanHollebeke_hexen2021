@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace Hexen.HexenSystem
 {
+
     public class CardDeck<TPosition> : MonoBehaviour
     {
         [SerializeField] private GameObject _cardDisplay;
@@ -53,7 +54,7 @@ namespace Hexen.HexenSystem
             }
 
             
-            _cardDisplay.GetComponent<CardDisplay>();
+            // _cardDisplay.GetComponent<CardDisplay>();
         }
     }
 }

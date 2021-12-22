@@ -1,44 +1,23 @@
 ﻿using System;
+using System.Collections.Generic;
+using Hexen.BoardSystem;
 using Hexen.HexenSystem;
 using Hexen.HexenSystem.PlayableCards;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using UnityEngine.UIElements;
-using Image = UnityEngine.UI.Image;
 
-namespace Hexen.GameSystem
+namespace Hexen.GameSystem.Cards 
 {
-    public class CardEventArgs : EventArgs
-    {
-        public CardBase<HexTile> Card { get; }
 
-        public CardEventArgs(CardBase<HexTile> card)
-        {
-            Card = card;
-        }
-    }
-    public class DragEventArgs : EventArgs
-    {
-        public HexTile HexTile { get; }
-
-        public DragEventArgs(HexTile hexTile)
-        {
-            HexTile = hexTile;
-        }
-    }
-
-    public class CardDisplay : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDragHandler
+    public class SlashCard : MonoBehaviour, ICard<HexTile>, IBeginDragHandler, IEndDragHandler, IDragHandler
     {
         #region Properties
-
-        public CardBase<HexTile> Card { get; set; }
         public Canvas Canvas { get; set; }
+        public Board<Capsule<HexTile>, HexTile> Board { get; set; }
+        public Grid<HexTile> Grid { get; set; }
 
         #endregion
-
-        public event EventHandler<PointerEventData> Dragging;
-        public event EventHandler<CardEventArgs> UsedCard;
 
         #region Fields
 
@@ -56,13 +35,30 @@ namespace Hexen.GameSystem
 
         void Start()
         {
+            this.gameObject.SetActive(false);
+
             _rectTransform = GetComponent<RectTransform>();
             _origin = this.transform.position;
             _canvasGroup = GetComponent<CanvasGroup>();
 
-            _title.text = Card.PlayableCardName.ToString();
-            _description.text = Card.Description;
+            _title.text = PlayableCardName.Slash.ToString();
+            _description.text = "Slashes all enemies in a chosen direction";
 
+        }
+
+        public bool CanExecute()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Execute(HexTile atPosition)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<HexTile> Positions()
+        {
+            throw new NotImplementedException();
         }
 
         #region Event Methods
@@ -80,30 +76,13 @@ namespace Hexen.GameSystem
             _canvasGroup.blocksRaycasts = true;
             this.transform.position = _origin;
             GetComponentInParent<HorizontalLayoutGroup>().enabled = true;
-            OnCardUse(new CardEventArgs(this.Card));
-        }
-
-        protected virtual void OnDragging(PointerEventData e)
-        {
-            var handler = Dragging;
-            handler?.Invoke(this, e);
-        }
-
-        protected virtual void OnCardUse(CardEventArgs e)
-        {
-            var handler = UsedCard;
-            handler?.Invoke(this, e);
         }
 
         public void OnDrag(PointerEventData eventData)
         {
-            OnDragging(eventData);
-            _rectTransform.anchoredPosition += eventData.delta / Canvas.scaleFactor ;
+            _rectTransform.anchoredPosition += eventData.delta / Canvas.scaleFactor;
         }
 
         #endregion
-
-        
     }
-
 }

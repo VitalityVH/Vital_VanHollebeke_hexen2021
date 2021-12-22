@@ -9,10 +9,10 @@ namespace Hexen.HexenSystem
     {
         private Board<Capsule<TPosition>, TPosition> _board;
         private Grid<TPosition> _grid;
-        private CardBase<TPosition> _card;
+        private ICard<TPosition> _card;
         private List<TPosition> _validPositions = new List<TPosition>();
 
-        public MovementHelper(Board<Capsule<TPosition>, TPosition> board, Grid<TPosition> grid, CardBase<TPosition> card)
+        public MovementHelper(Board<Capsule<TPosition>, TPosition> board, Grid<TPosition> grid, ICard<TPosition> card)
         {
             _board = board;
             _grid = grid;

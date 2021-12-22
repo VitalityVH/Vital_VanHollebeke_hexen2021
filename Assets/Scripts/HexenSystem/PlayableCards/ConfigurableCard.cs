@@ -4,24 +4,37 @@ using UnityEngine;
 
 namespace Hexen.HexenSystem.PlayableCards
 {
-    class ConfigurableCard<TPosition> : CardBase<TPosition> where TPosition : IPosition
+    class ConfigurableCard<TPosition> : ICard<TPosition> where TPosition : IPosition
     {
         public delegate List<TPosition>
-            PositionsCollector(Board<Capsule<TPosition>, TPosition> board, Grid<TPosition> grid, Capsule<TPosition> capsule);
+            PositionsCollector(Board<Capsule<TPosition>, TPosition> board, Grid<TPosition> grid, ICard<TPosition> card);
 
         private PositionsCollector _collectPositions;
-
-        public ConfigurableCard(Board<Capsule<TPosition>, TPosition> board, Grid<TPosition> grid, PositionsCollector positionsCollector) : base(board, grid)
+        private Board<Capsule<TPosition>, TPosition> _board;
+        private Grid<TPosition> _grid;
+        public ConfigurableCard(Board<Capsule<TPosition>, TPosition> board, Grid<TPosition> grid, PositionsCollector positionsCollector)
         {
             _collectPositions = positionsCollector;
+            _board = board;
+            _grid = grid;
         }
 
-        public override void Execute(CardBase<TPosition> card, TPosition position)
+        public List<TPosition> Positions(ICard<TPosition> card)
+            => _collectPositions(_board, _grid, card);
+
+        public bool CanExecute()
         {
             throw new System.NotImplementedException();
         }
 
-        public override List<TPosition> Positions(Capsule<TPosition> capsule, CardBase<TPosition> card)
-            => _collectPositions(Board, Grid, capsule);
+        public void Execute(TPosition atPosition)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public List<TPosition> Positions()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
