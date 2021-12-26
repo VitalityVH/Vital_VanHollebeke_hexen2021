@@ -4,7 +4,6 @@ using Hexen.HexenSystem;
 
 namespace Hexen.DeckSystem
 {
-
     public class CardEventArgs<TCard> : EventArgs
     {
         public TCard Card { get; }
@@ -15,29 +14,54 @@ namespace Hexen.DeckSystem
         }
     }
 
-    public class DeckManager<TPosition>
+    public class DeckManager<TCard, TPosition>
+        where TCard : ICard<TPosition>
     {
-        private List<ICard<TPosition>> _cards;
+        private List<TCard> _cards = new List<TCard>();
+        private int _handSize = 5;
 
-        public EventHandler<CardEventArgs<ICard<TPosition>>> PlayCard;
+        public EventHandler<CardEventArgs<TCard>> PlayCard;
 
-        public void Register(ICard<TPosition> card)
+        public void Register(TCard card)
         {
+            card.SetActive(false);
             _cards.Add(card);
         }
 
         public void FillHand()
         {
-
+            if (_cards.Count > _handSize)
+            {
+                for (int i = 0; i < _handSize; i++)
+                {
+                    if (_cards.Count > 0)
+                    {
+                        Activate(_cards[i]);
+                    }
+                }
+            }
+            
         }
 
-        public bool Play(ICard<TPosition> card, TPosition position)
+        private void Activate(TCard card)
         {
-            return true;
+            card.SetActive(true);
+        }
+
+        public void Play(TCard card, TPosition position)
+        {
+            if (!_cards.Remove(card))
+                return;
+
+            if (card.Execute(position))
+            {
+                OnPlay(new CardEventArgs<TCard>(card));
+                return;
+            }
         }
 
 
-        protected virtual void OnPlay(CardEventArgs<ICard<TPosition>> eventArgs)
+        protected virtual void OnPlay(CardEventArgs<TCard> eventArgs)
         {
             var handler = PlayCard;
             handler?.Invoke(this, eventArgs);

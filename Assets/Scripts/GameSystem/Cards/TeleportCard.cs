@@ -17,9 +17,9 @@ namespace Hexen.GameSystem.Cards
         public Board<Capsule<HexTile>, HexTile> Board { get; set; }
         public Grid<HexTile> Grid { get; set; }
 
-        #endregion
+        public PlayableCardName Type { get; set; }
 
-        public EventHandler<CardEventArgs<ICard<HexTile>>> Played;
+        #endregion
 
         #region Fields
 
@@ -37,30 +37,40 @@ namespace Hexen.GameSystem.Cards
 
         void Start()
         {
-            this.gameObject.SetActive(false);
-
             _rectTransform = GetComponent<RectTransform>();
             _origin = this.transform.position;
             _canvasGroup = GetComponent<CanvasGroup>();
 
             _title.text = PlayableCardName.Teleport.ToString();
             _description.text = "Teleports the hero capsule to a available hexTile";
-
         }
 
-        public bool CanExecute()
+        public void SetActive(bool active)
         {
-            throw new NotImplementedException();
+            gameObject.SetActive(active);
         }
 
-        public void Execute(HexTile atPosition)
+        public bool CanExecute(HexTile atPosition)
         {
-            throw new NotImplementedException();
+            return Positions(atPosition).Contains(atPosition);
         }
 
-        public List<HexTile> Positions()
+        public bool Execute(HexTile atPosition)
         {
-            throw new NotImplementedException();
+            if (CanExecute(atPosition))
+            {
+                Board.Teleport(atPosition);
+                Board.HeroCapsule.TeleportTo(atPosition);
+                return true;
+            }
+            return false;
+        }
+
+        public List<HexTile> Positions(HexTile pos)
+        {
+            return new MovementHelper<HexTile>(Board,Grid)
+                .ReturnAllHexTiles(MovementHelper<HexTile>.Empty)
+                .CollectValidPositions();
         }
 
         #region Event Methods
@@ -85,6 +95,10 @@ namespace Hexen.GameSystem.Cards
             _rectTransform.anchoredPosition += eventData.delta / Canvas.scaleFactor;
         }
 
+        public void ActivateLayoutGroup()
+        {
+            GetComponentInParent<HorizontalLayoutGroup>().enabled = true;
+        }
         #endregion
     }
 

@@ -30,7 +30,6 @@ namespace Hexen.SelectionSystem
 
         public bool Select(TSelectableItem selectableItem)
         {
-            
             if (_selectedItems.Add(selectableItem))
             {
                 OnSelected(new SelectionEventArgs<TSelectableItem>(selectableItem));

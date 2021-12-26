@@ -5,8 +5,11 @@ namespace Hexen.HexenSystem
 {
     public interface ICard<TPosition>
     {
-        bool CanExecute();
-        void Execute(TPosition atPosition);
-        List<TPosition> Positions();
+        public PlayableCardName Type { get; set; }
+        void SetActive(bool active);
+        bool CanExecute(TPosition atPosition);
+        bool Execute(TPosition atPosition);
+        void ActivateLayoutGroup();
+        List<TPosition> Positions(TPosition atPosition);
     }
 }

@@ -15,7 +15,7 @@ namespace Hexen.GameSystem.Cards
         public Canvas Canvas { get; set; }
         public Board<Capsule<HexTile>, HexTile> Board { get; set; }
         public Grid<HexTile> Grid { get; set; }
-
+        public PlayableCardName Type { get; set; }
         #endregion
 
         #region Fields
@@ -34,8 +34,6 @@ namespace Hexen.GameSystem.Cards
 
         void Start()
         {
-            this.gameObject.SetActive(false);
-
             _rectTransform = GetComponent<RectTransform>();
             _origin = this.transform.position;
             _canvasGroup = GetComponent<CanvasGroup>();
@@ -44,20 +42,80 @@ namespace Hexen.GameSystem.Cards
             _description.text = "Slashes all enemies in a chosen direction";
 
         }
-
-        public bool CanExecute()
+        public void SetActive(bool active)
         {
-            throw new NotImplementedException();
+            gameObject.SetActive(active);
+        }
+        public bool CanExecute(HexTile atPosition)
+        {
+            return Positions(atPosition).Contains(atPosition);
         }
 
-        public void Execute(HexTile atPosition)
+        public bool Execute(HexTile atPosition)
         {
-            throw new NotImplementedException();
+            if (CanExecute(atPosition))
+            {
+                foreach (var hexTile in Positions(atPosition))
+                {
+                    if (Board.TryGetCapsule(hexTile, out var capsule))
+                    {
+                        Grid.TryGetCoordinateAt(hexTile, out var hexCoordinate);
+                        Board.TryGetPosition(Board.HeroCapsule, out var heroHex);
+                        Grid.TryGetCoordinateAt(heroHex, out var heroHexCoordinate);
+
+                        (float x, float y) offSet = (hexCoordinate.x - heroHexCoordinate.x,
+                            hexCoordinate.y - heroHexCoordinate.y);
+
+                        Grid.TryGetPositionAt(hexCoordinate.x + offSet.x, hexCoordinate.y + offSet.y,
+                            out var targetHexTile);
+                        
+                        if (Grid.HexPositions.ContainsKey(targetHexTile))
+                        { 
+                            if (!Board.TryGetCapsule(targetHexTile, out _))
+                            {
+                                Board.Push(capsule, targetHexTile); 
+                                capsule.PushedTo(targetHexTile);
+                            }
+                        }
+                        else
+                        {
+                            Board.Hit(capsule);
+                            capsule.HitFrom(hexTile);
+                        }
+                    }
+                }
+                return true;
+            }
+            return false;
         }
 
-        public List<HexTile> Positions()
+        private int mod(int x, int m) => (x % m + m) % m;
+        public List<HexTile> Positions(HexTile hoveredTile)
         {
-            throw new NotImplementedException();
+            List<HexTile> completeList = new List<HexTile>();
+
+            for (int i = 0; i < MovementHelper<HexTile>.Offsets.Count; i++)
+            {
+                var list = new MovementHelper<HexTile>(Board, Grid).Collect(MovementHelper<HexTile>.Offsets[i].x,
+                    MovementHelper<HexTile>.Offsets[i].y, 1).CollectValidPositions();
+                if (list.Contains(hoveredTile))
+                {
+                    completeList.Clear();
+
+                    completeList.AddRange(new MovementHelper<HexTile>(Board, Grid).Collect(MovementHelper<HexTile>.Offsets[mod((i - 1), 6)].x,
+                        MovementHelper<HexTile>.Offsets[mod((i - 1), 6)].y, 1).CollectValidPositions());
+                    completeList.AddRange(list);
+                    completeList.AddRange(new MovementHelper<HexTile>(Board, Grid).Collect(MovementHelper<HexTile>.Offsets[mod((i + 1), 6)].x,
+                        MovementHelper<HexTile>.Offsets[mod((i + 1), 6)].y, 1).CollectValidPositions());
+
+                    return completeList;
+                }
+                else
+                {
+                    completeList.AddRange(list);
+                }
+            }
+            return completeList;
         }
 
         #region Event Methods
@@ -83,6 +141,10 @@ namespace Hexen.GameSystem.Cards
             _rectTransform.anchoredPosition += eventData.delta / Canvas.scaleFactor;
         }
 
+        public void ActivateLayoutGroup()
+        {
+            GetComponentInParent<HorizontalLayoutGroup>().enabled = true;
+        }
         #endregion
     }
 }

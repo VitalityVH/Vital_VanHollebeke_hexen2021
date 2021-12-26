@@ -17,6 +17,7 @@ namespace Hexen.GameSystem.Cards
         public Board<Capsule<HexTile>, HexTile> Board { get; set; }
         public Grid<HexTile> Grid { get; set; }
 
+        public PlayableCardName Type { get; set; }
         #endregion
 
         #region Fields
@@ -35,8 +36,6 @@ namespace Hexen.GameSystem.Cards
 
         void Start()
         {
-            this.gameObject.SetActive(false);
-
             _rectTransform = GetComponent<RectTransform>();
             _origin = this.transform.position;
             _canvasGroup = GetComponent<CanvasGroup>();
@@ -45,20 +44,46 @@ namespace Hexen.GameSystem.Cards
             _description.text = "Slashes all enemies in a chosen direction";
 
         }
-
-        public bool CanExecute()
+        public void SetActive(bool active)
         {
-            throw new NotImplementedException();
+            gameObject.SetActive(active);
+        }
+        public bool CanExecute(HexTile atPosition)
+        {
+            return Positions(atPosition).Contains(atPosition);
         }
 
-        public void Execute(HexTile atPosition)
+        public bool Execute(HexTile atPosition)
         {
-            throw new NotImplementedException();
+            if (CanExecute(atPosition))
+            {
+                foreach (var hexTile in Positions(atPosition))
+                {
+                    if (Board.TryGetCapsule(hexTile, out var capsule))
+                    {
+                        Board.Hit(capsule);
+                        capsule.HitFrom(hexTile);
+                    }
+                }
+                return true;
+            }
+            return false;
         }
 
-        public List<HexTile> Positions()
+        public List<HexTile> Positions(HexTile hoveredTile)
         {
-            throw new NotImplementedException();
+            List<HexTile> completeList = new List<HexTile>();
+
+            foreach(var offset in MovementHelper<HexTile>.Offsets)
+            {
+                var list = new MovementHelper<HexTile>(Board, Grid).Collect(offset.x, offset.y).CollectValidPositions();
+                if (list.Contains(hoveredTile))
+                    return list;
+                else
+                    completeList.AddRange(list);
+            }
+
+            return completeList;
         }
 
         #region Event Methods
@@ -83,6 +108,10 @@ namespace Hexen.GameSystem.Cards
             _rectTransform.anchoredPosition += eventData.delta / Canvas.scaleFactor;
         }
 
+        public void ActivateLayoutGroup()
+        {
+            GetComponentInParent<HorizontalLayoutGroup>().enabled = true;
+        }
         #endregion
     }
 }

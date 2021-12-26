@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Hexen.HexenSystem;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -10,8 +11,11 @@ namespace Hexen.GameSystem
     {
         public HexTile HexTile { get; }
 
-        public DropEventArgs(HexTile hexTile)
+        public ICard<HexTile> Card { get;}
+
+        public DropEventArgs(ICard<HexTile> card,HexTile hexTile)
         {
+            Card = card;
             HexTile = hexTile;
         }
     }
@@ -20,8 +24,11 @@ namespace Hexen.GameSystem
     {
         public HexTile HexTile { get; }
 
-        public CardEnterEventArgs(HexTile hexTile)
+        public ICard<HexTile> Card { get; }
+
+        public CardEnterEventArgs(ICard<HexTile> card, HexTile hexTile)
         {
+            Card = card;
             HexTile = hexTile;
         }
     }
@@ -30,8 +37,11 @@ namespace Hexen.GameSystem
     {
         public HexTile HexTile { get; }
 
-        public CardExitEventArgs(HexTile hexTile)
+        public ICard<HexTile> Card { get; }
+
+        public CardExitEventArgs(ICard<HexTile> card, HexTile hexTile)
         {
+            Card = card;
             HexTile = hexTile;
         }
     }
@@ -43,6 +53,7 @@ namespace Hexen.GameSystem
         public int Q, R, S;
         
         public event EventHandler<DropEventArgs> Dropped;
+
         public event EventHandler<CardEnterEventArgs> CardEntered;
         public event EventHandler<CardExitEventArgs> CardExited;
 
@@ -167,7 +178,7 @@ namespace Hexen.GameSystem
 
         public void OnDrop(PointerEventData eventData)
         {
-            OnCardDrop(new DropEventArgs(this));
+            OnCardDrop(new DropEventArgs(eventData.pointerDrag.GetComponent<ICard<HexTile>>(),this));
         }
         #endregion
 
@@ -181,9 +192,7 @@ namespace Hexen.GameSystem
         {
             if (eventData.dragging)
             {
-                OnCardEnter(new CardEnterEventArgs(this));
-                
-               Debug.Log($"Dragging over {this}");
+                OnCardEnter(new CardEnterEventArgs(eventData.pointerDrag.GetComponent<ICard<HexTile>>(),this));
             }
         }
 
@@ -198,8 +207,7 @@ namespace Hexen.GameSystem
         {
             if (eventData.dragging)
             {
-                OnCardExit(new CardExitEventArgs(this));
-                Debug.Log($"Exited {this}");
+                OnCardExit(new CardExitEventArgs(eventData.pointerDrag.GetComponent<ICard<HexTile>>(),this));
             }
         }
 

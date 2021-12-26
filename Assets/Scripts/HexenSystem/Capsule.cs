@@ -6,7 +6,6 @@ using UnityEngine;
 
 namespace Hexen.HexenSystem
 {
-
     public class CapsuleEventArgs<TPosition> : EventArgs
     {
         public TPosition Position { get; }
@@ -43,7 +42,7 @@ namespace Hexen.HexenSystem
 
         #region Push
 
-        public void PushedFrom(TPosition position)
+        public void PushedTo(TPosition position)
         {
             OnPushed(new CapsuleEventArgs<TPosition>(position));
         }

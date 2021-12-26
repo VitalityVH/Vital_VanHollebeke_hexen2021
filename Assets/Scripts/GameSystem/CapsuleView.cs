@@ -37,12 +37,13 @@ namespace Hexen.GameSystem
 
         private void OnCapsuleHit(object sender, CapsuleEventArgs<HexTile> eventArgs)
         {
-
+            if (this.gameObject != null)
+                Destroy(this.gameObject);
         }
 
         private void OnCapsulePushed(object sender, CapsuleEventArgs<HexTile> eventArgs)
         {
-
+            gameObject.transform.position = eventArgs.Position.transform.position;
         }
 
         private void OnCapsuleTeleported(object sender, CapsuleEventArgs<HexTile> eventArgs)

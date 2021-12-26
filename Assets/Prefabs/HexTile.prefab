@@ -58,6 +58,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: faf08717bf26f1344992c81891165f78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Q: 0
+  R: 0
+  S: 0
   OnActivate:
     m_PersistentCalls:
       m_Calls:
@@ -81,7 +84,7 @@ MonoBehaviour:
         m_MethodName: set_material
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 2100000, guid: 6dea8480399f0544d887daf5297f98b7, type: 2}
+          m_ObjectArgument: {fileID: 5561349426305759274, guid: 288144c5c078dce4aaa410b5b2c2bc9a, type: 3}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Material, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0

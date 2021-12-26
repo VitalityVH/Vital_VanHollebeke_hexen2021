@@ -2,21 +2,27 @@
 using System.Linq;
 using Hexen.BoardSystem;
 using Hexen.HexenSystem.PlayableCards;
+using UnityEngine.Scripting;
 
 namespace Hexen.HexenSystem
 {
-    internal class MovementHelper<TPosition> 
+    public class MovementHelper<TPosition>
     {
+
+        public static List<(int x, int y)> Offsets = new List<(int x, int y)>()
+        {
+            (1, 0), (0,1), (-1, 1), (-1, 0), (0, -1), (1, -1)
+        };
+
         private Board<Capsule<TPosition>, TPosition> _board;
         private Grid<TPosition> _grid;
         private ICard<TPosition> _card;
         private List<TPosition> _validPositions = new List<TPosition>();
 
-        public MovementHelper(Board<Capsule<TPosition>, TPosition> board, Grid<TPosition> grid, ICard<TPosition> card)
+        public MovementHelper(Board<Capsule<TPosition>, TPosition> board, Grid<TPosition> grid)
         {
             _board = board;
             _grid = grid;
-            _card = card;
         }
 
         public MovementHelper<TPosition> Left(int maxSteps = int.MaxValue, params Validator[] validators)
@@ -36,9 +42,7 @@ namespace Hexen.HexenSystem
 
         public MovementHelper<TPosition> BottomRight(int maxSteps = int.MaxValue, params Validator[] validators)
             => Collect(0, 1, maxSteps, validators);
-
-        public MovementHelper<TPosition> AllHexTiles(int maxSteps = int.MaxValue, params Validator[] validators)
-            => ReturnAllHexTiles(validators);
+        
 
 
 
