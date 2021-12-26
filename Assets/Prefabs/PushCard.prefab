@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4127589958829167459}
   - component: {fileID: 4127589958829167458}
   - component: {fileID: 4127589958829167456}
+  - component: {fileID: -709265705840242242}
   - component: {fileID: 4127589958829167457}
   m_Layer: 5
   m_Name: PushCard
@@ -95,6 +96,19 @@ MonoBehaviour:
   _image: {fileID: 7509306398869871835}
   _title: {fileID: 5506122615883653335}
   _description: {fileID: 5780097787745224350}
+--- !u!114 &-709265705840242242
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4127589958829167460}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6a2d21796a21cf4eae6d064773b8c1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _canvas: {fileID: 0}
 --- !u!225 &4127589958829167457
 CanvasGroup:
   m_ObjectHideFlags: 0

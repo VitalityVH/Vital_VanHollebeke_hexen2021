@@ -9,10 +9,9 @@ using UnityEngine.UI;
 
 namespace Hexen.GameSystem.Cards
 {
-    public class SwipeCard : MonoBehaviour, ICard<HexTile>, IBeginDragHandler, IEndDragHandler, IDragHandler
+    public class SwipeCard : MonoBehaviour, ICard<HexTile>
     {
         #region Properties
-        public Canvas Canvas { get; set; }
         public Board<Capsule<HexTile>, HexTile> Board { get; set; }
         public Grid<HexTile> Grid { get; set; }
 
@@ -26,20 +25,10 @@ namespace Hexen.GameSystem.Cards
         [SerializeField] private Text _title;
         [SerializeField] private Text _description;
 
-
-        private CanvasGroup _canvasGroup;
-        private RectTransform _rectTransform;
-        private Vector3 _origin;
-
-
         #endregion
 
         void Start()
         {
-            _rectTransform = GetComponent<RectTransform>();
-            _origin = this.transform.position;
-            _canvasGroup = GetComponent<CanvasGroup>();
-
             _title.text = PlayableCardName.Swipe.ToString();
             _description.text = "Swipes enemies in a chosen neighboring hexTile";
 
@@ -98,34 +87,9 @@ namespace Hexen.GameSystem.Cards
             }
             return completeList;
         }
-
-        #region Event Methods
-
-        public void OnBeginDrag(PointerEventData eventData)
-        {
-            _canvasGroup.alpha = .6f;
-            _canvasGroup.blocksRaycasts = false;
-            GetComponentInParent<HorizontalLayoutGroup>().enabled = false;
-        }
-
-        public void OnEndDrag(PointerEventData eventData)
-        {
-            _canvasGroup.alpha = 1;
-            _canvasGroup.blocksRaycasts = true;
-            this.transform.position = _origin;
-            GetComponentInParent<HorizontalLayoutGroup>().enabled = true;
-        }
-
-        public void OnDrag(PointerEventData eventData)
-        {
-            _rectTransform.anchoredPosition += eventData.delta / Canvas.scaleFactor;
-        }
-
         public void ActivateLayoutGroup()
         {
             GetComponentInParent<HorizontalLayoutGroup>().enabled = true;
         }
-
-        #endregion
     }
 }

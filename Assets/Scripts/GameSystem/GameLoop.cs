@@ -21,8 +21,6 @@ namespace Hexen.GameSystem
         [SerializeField] private GameObject _enemyModel;
         [SerializeField] private GameObject _heroModel;
 
-        [SerializeField] private Canvas _canvas;
-
         [SerializeField] private GameObject _deckHand;
         [SerializeField] private GameObject _teleportCard;
         [SerializeField] private GameObject _swipeCard;
@@ -31,7 +29,7 @@ namespace Hexen.GameSystem
 
         [SerializeField] private PositionHelper _positionHelper;
 
-
+        [SerializeField] private int _fieldRadius = 5;
         [SerializeField] private int _deckSize = 13;
 
 
@@ -47,7 +45,7 @@ namespace Hexen.GameSystem
 
         void Start()
         {
-            _grid = new Grid<HexTile>(3);
+            _grid = new Grid<HexTile>(_fieldRadius);
             _board = new Board<Capsule<HexTile>, HexTile>();
             _selectionManager = new SelectionManager<HexTile>();
             _deckManager = new DeckManager<ICard<HexTile>,HexTile>();
@@ -109,9 +107,7 @@ namespace Hexen.GameSystem
 
                     _grid.Register(newHexTile, q,r);
                 }
-
             }
-
         }
 
         private void Play(ICard<HexTile> eventArgsCard, HexTile eventArgsHexTile)
@@ -178,7 +174,6 @@ namespace Hexen.GameSystem
                 case 1:
                     var newTeleportCard = Instantiate(_teleportCard, _deckHand.transform);
                     TeleportCard teleportCard = newTeleportCard.GetComponent<TeleportCard>();
-                    teleportCard.Canvas = _canvas;
                     teleportCard.Type = PlayableCardName.Teleport;
                     teleportCard.Board = _board;
                     teleportCard.Grid = _grid;
@@ -187,7 +182,6 @@ namespace Hexen.GameSystem
                 case 2:
                     var newSlashCard = Instantiate(_slashCard, _deckHand.transform);
                     SlashCard slashCard = newSlashCard.GetComponent<SlashCard>();
-                    slashCard.Canvas = _canvas;
                     slashCard.Type = PlayableCardName.Slash;
                     slashCard.Board = _board;
                     slashCard.Grid = _grid;
@@ -196,7 +190,6 @@ namespace Hexen.GameSystem
                 case 3:
                     var newSwipeCard = Instantiate(_swipeCard, _deckHand.transform);
                     SwipeCard swipeCard = newSwipeCard.GetComponent<SwipeCard>();
-                    swipeCard.Canvas = _canvas;
                     swipeCard.Type = PlayableCardName.Swipe;
                     swipeCard.Board = _board;
                     swipeCard.Grid = _grid;
@@ -205,7 +198,6 @@ namespace Hexen.GameSystem
                 case 4:
                     var newPushCard = Instantiate(_pushCard, _deckHand.transform);
                     PushCard pushCard = newPushCard.GetComponent<PushCard>();
-                    pushCard.Canvas = _canvas;
                     pushCard.Type = PlayableCardName.Pushback;
                     pushCard.Board = _board;
                     pushCard.Grid = _grid;
