@@ -19,7 +19,7 @@ namespace Hexen.GameSystem
                     model.Teleported -= OnCapsuleTeleported;
                     model.Hit -= OnCapsuleHit;
                     model.Pushed -= OnCapsulePushed;
-
+                    model.UnHit -= OnCapsuleReappear;
                     //     model.ActivationStatusChanged -= OnPieceActivationChanged;
                 }
 
@@ -30,15 +30,23 @@ namespace Hexen.GameSystem
                     model.Teleported += OnCapsuleTeleported;
                     model.Hit += OnCapsuleHit;
                     model.Pushed += OnCapsulePushed;
+                    model.UnHit += OnCapsuleReappear;
                     //     model.ActivationStatusChanged += OnPieceActivationChanged;
                 }
             }
         }
 
+        private void OnCapsuleReappear(object sender, CapsuleEventArgs<HexTile> eventArgs)
+        {
+            if (this.gameObject != null)
+                this.gameObject.SetActive(true);
+        }
+
         private void OnCapsuleHit(object sender, CapsuleEventArgs<HexTile> eventArgs)
         {
             if (this.gameObject != null)
-                Destroy(this.gameObject);
+                this.gameObject.SetActive(false);
+            // Destroy(this.gameObject);
         }
 
         private void OnCapsulePushed(object sender, CapsuleEventArgs<HexTile> eventArgs)

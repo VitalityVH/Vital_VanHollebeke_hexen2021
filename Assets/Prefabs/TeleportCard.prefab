@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: -4114770536347936179}
   - component: {fileID: 4127589958829167457}
   m_Layer: 5
-  m_Name: TeleportCard 1
+  m_Name: TeleportCard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

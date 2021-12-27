@@ -4,6 +4,7 @@ using Hexen.BoardSystem;
 using Hexen.DeckSystem;
 using Hexen.HexenSystem;
 using Hexen.HexenSystem.PlayableCards;
+using Hexen.ReplaySystem;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -15,6 +16,7 @@ namespace Hexen.GameSystem.Cards
         #region Properties
         public Board<Capsule<HexTile>, HexTile> Board { get; set; }
         public Grid<HexTile> Grid { get; set; }
+        public ReplayManager ReplayManager { get; set; }
 
         public PlayableCardName Type { get; set; }
 
@@ -45,15 +47,24 @@ namespace Hexen.GameSystem.Cards
             return Positions(atPosition).Contains(atPosition);
         }
 
-        public bool Execute(HexTile atPosition)
+        public void Execute(HexTile atPosition)
         {
-            if (CanExecute(atPosition))
+            if (!Board.TryGetPosition(Board.HeroCapsule, out var oldPos))
+                return;
+
+            Action forward = () =>
             {
                 Board.Teleport(atPosition);
                 Board.HeroCapsule.TeleportTo(atPosition);
-                return true;
-            }
-            return false;
+            };
+
+            Action backward = () =>
+            {
+                Board.Teleport(oldPos);
+                Board.HeroCapsule.TeleportTo(oldPos);
+            };
+
+            ReplayManager.Execute(new DelegateReplayCommand(forward, backward));
         }
 
         public List<HexTile> Positions(HexTile pos)

@@ -18,13 +18,22 @@ namespace Hexen.HexenSystem
 
     public class Capsule<TPosition>
     {
+        #region EventHandlers
+
         public event EventHandler<CapsuleEventArgs<TPosition>> Teleported;
         public event EventHandler<CapsuleEventArgs<TPosition>> Pushed;
         public event EventHandler<CapsuleEventArgs<TPosition>> Hit;
+        public event EventHandler<CapsuleEventArgs<TPosition>> UnHit;
+
+        #endregion
+
+        #region Properties
 
         public CapsuleType CapsuleType { get; set; }
         public TPosition HexTile;
 
+        #endregion
+        
         #region Teleport
 
         public void TeleportTo(TPosition position)
@@ -70,6 +79,16 @@ namespace Hexen.HexenSystem
 
         #endregion
 
+        public void Reappear(TPosition position)
+        {
+            OnReappear(new CapsuleEventArgs<TPosition>(position));
+        }
+
+        protected virtual void OnReappear(CapsuleEventArgs<TPosition> capsuleEventArgs)
+        {
+            var handler = UnHit;
+            handler?.Invoke(this, capsuleEventArgs);
+        }
     }
 }
 

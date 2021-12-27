@@ -53,11 +53,11 @@ namespace Hexen.DeckSystem
             if (!_cards.Remove(card))
                 return;
 
-            if (card.Execute(position))
-            {
-                OnPlay(new CardEventArgs<TCard>(card));
+            if (!card.CanExecute(position))
                 return;
-            }
+
+            card.Execute(position);
+            OnPlay(new CardEventArgs<TCard>(card));
         }
 
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Hexen.BoardSystem;
 using Hexen.HexenSystem;
 using Hexen.HexenSystem.PlayableCards;
+using Hexen.ReplaySystem;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -15,17 +16,16 @@ namespace Hexen.GameSystem.Cards
         #region Properties
         public Board<Capsule<HexTile>, HexTile> Board { get; set; }
         public Grid<HexTile> Grid { get; set; }
-
+        public ReplayManager ReplayManager { get; set; }
         public PlayableCardName Type { get; set; }
         #endregion
-
+        
+        
         #region Fields
 
         [SerializeField] private Image _image;
         [SerializeField] private Text _title;
         [SerializeField] private Text _description;
-        
-
 
         #endregion
 
@@ -44,21 +44,35 @@ namespace Hexen.GameSystem.Cards
             return Positions(atPosition).Contains(atPosition);
         }
 
-        public bool Execute(HexTile atPosition)
+        public void Execute(HexTile atPosition)
         {
-            if (CanExecute(atPosition))
+            var hitCapsules = new Dictionary<Capsule<HexTile>, HexTile>();
+
+            Action forward = () =>
             {
+                hitCapsules.Clear();
+
                 foreach (var hexTile in Positions(atPosition))
                 {
                     if (Board.TryGetCapsule(hexTile, out var capsule))
                     {
+                        hitCapsules.Add(capsule, hexTile);
                         Board.Hit(capsule);
                         capsule.HitFrom(hexTile);
                     }
                 }
-                return true;
-            }
-            return false;
+            };
+
+            Action backward = () =>
+            {
+                foreach (var capsule in hitCapsules)
+                {
+                    capsule.Key.Reappear(atPosition);
+                    Board.Place(capsule.Key, capsule.Value);
+                }
+            };
+
+            ReplayManager.Execute(new DelegateReplayCommand(forward, backward));
         }
 
         public List<HexTile> Positions(HexTile hoveredTile)

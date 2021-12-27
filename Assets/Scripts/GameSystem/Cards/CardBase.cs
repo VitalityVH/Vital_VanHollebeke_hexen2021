@@ -6,11 +6,16 @@ namespace Hexen.GameSystem.Cards
 {
     public class CardBase : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
     {
-        private Canvas _canvas;
+        #region Fields
 
+        private Canvas _canvas;
         private CanvasGroup _canvasGroup;
         private RectTransform _rectTransform;
         private Vector3 _origin;
+
+        #endregion
+
+        #region MonoBehaviour Methods
 
         void Start()
         {
@@ -19,7 +24,11 @@ namespace Hexen.GameSystem.Cards
             _canvas = FindObjectOfType<Canvas>();
             _canvasGroup = GetComponent<CanvasGroup>();
         }
+
+        #endregion
         
+        #region Event Methods
+
         public void OnBeginDrag(PointerEventData eventData)
         {
             _canvasGroup.alpha = .6f;
@@ -39,5 +48,7 @@ namespace Hexen.GameSystem.Cards
         {
             _rectTransform.anchoredPosition += eventData.delta / _canvas.scaleFactor;
         }
+
+        #endregion
     }
 }
