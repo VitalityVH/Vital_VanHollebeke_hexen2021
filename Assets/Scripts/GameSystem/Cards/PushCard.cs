@@ -72,9 +72,6 @@ namespace Hexen.GameSystem.Cards
                         {
                             if (!Board.TryGetCapsule(targetHexTile, out _)) //and if there is no enemy behind
                             {
-                                Debug.Log($"{capsule}, {hexTile}");
-                                Debug.Log($"{capsule}, {targetHexTile}");
-
                                 pushedCapsuleOldPositions.Add(capsule, hexTile);
                                 pushedCapsuleNewPositions.Add(capsule, targetHexTile);
 
