@@ -26,14 +26,6 @@ namespace Hexen.GameSystem
 
             return new Vector3(x,0,y);
         }
-
-        // public (int x, int y) WorldToGridPosition(Board<Capsule<IPosition>,IPosition> board ,Grid<HexTile> grid, Vector3 worldPos)
-        // {
-        //     var scaledWorldPos = worldPos / _tileDimension;
-        //     return default;
-        // }
-
-
         #endregion
     }
 }

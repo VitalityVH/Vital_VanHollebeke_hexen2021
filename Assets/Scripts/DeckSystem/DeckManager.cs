@@ -18,6 +18,7 @@ namespace Hexen.DeckSystem
         where TCard : ICard<TPosition>
     {
         private List<TCard> _cards = new List<TCard>();
+
         private int _handSize = 5;
 
         public EventHandler<CardEventArgs<TCard>> PlayCard;

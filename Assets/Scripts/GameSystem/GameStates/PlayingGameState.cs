@@ -70,7 +70,15 @@ namespace Hexen.GameSystem.GameStates
 
         public override void Play(ICard<HexTile> eventArgsCard, HexTile eventArgsHexTile)
         {
-            _deckManager.Play(eventArgsCard, eventArgsHexTile);
+            if (eventArgsCard.Positions(eventArgsHexTile).Contains(eventArgsHexTile))
+            {
+                _deckManager.Play(eventArgsCard, eventArgsHexTile);
+            }
+            else
+            {
+                DeselectAll();
+            }
+                
         }
 
         public override void Backward()

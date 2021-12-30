@@ -33,7 +33,6 @@ namespace Hexen.GameSystem.Cards
         {
             _title.text = PlayableCardName.Slash.ToString();
             _description.text = "Slashes all enemies in a chosen direction";
-
         }
         public void SetActive(bool active)
         {

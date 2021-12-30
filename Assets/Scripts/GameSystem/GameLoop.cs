@@ -39,41 +39,12 @@ namespace Hexen.GameSystem
 
 
         private StateMachine<GameStateBase> _gameStateMachine;
-        //
-        // private Grid<HexTile> _grid;
-        // private Board<Capsule<HexTile>, HexTile> _board;
-        // private SelectionManager<HexTile> _selectionManager;
-        // private DeckManager<ICard<HexTile>, HexTile> _deckManager;
-        
         #endregion
 
         #region Methods
 
         void Start()
         {
-            // _grid = new Grid<HexTile>(_fieldRadius);
-            // _board = new Board<Capsule<HexTile>, HexTile>();
-            // _selectionManager = new SelectionManager<HexTile>();
-            // _deckManager = new DeckManager<ICard<HexTile>,HexTile>();
-            //
-            // _selectionManager.Selected += (source, eventArgs) =>
-            // {
-            //     eventArgs.SelectionItem.Highlight = true;
-            // };
-            //
-            // _selectionManager.Deselected += (source, eventArgs) =>
-            // {
-            //     eventArgs.SelectionItem.Highlight = false;
-            // };
-            //
-            // _deckManager.PlayCard += (source, eventArgs) =>
-            // {
-            //     DeselectAll();
-            //     eventArgs.Card.ActivateLayoutGroup();
-            //     eventArgs.Card.SetActive(false);
-            //     _deckManager.FillHand();
-            // };
-
             var grid = new Grid<HexTile>(_fieldRadius);
             var board = new Board<Capsule<HexTile>, HexTile>();
             var deckManager = new DeckManager<ICard<HexTile>, HexTile>();
@@ -93,12 +64,6 @@ namespace Hexen.GameSystem
             PopulateHand(deckManager);
 
         }
-
-        // private void DeselectAll()
-        // {
-        //     _selectionManager.DeselectAll();
-        // }
-
         private void GenerateGrid(Grid<HexTile> grid)
         {
             for (int q = -grid.Radius; q <= grid.Radius; q++)
@@ -135,10 +100,12 @@ namespace Hexen.GameSystem
                 Capsule<HexTile> newHeroCapsule = new Capsule<HexTile>();
 
                 newHeroCapsuleView.Model = newHeroCapsule;
+
                 newHeroCapsule.HexTile = middleHexTile;
                 newHeroCapsule.CapsuleType = CapsuleType.Hero;
 
                 board.HeroCapsule = newHeroCapsule;
+
                 board.Place(newHeroCapsule, newHeroCapsule.HexTile);
             }
         }
@@ -181,6 +148,7 @@ namespace Hexen.GameSystem
                 case 1:
                     var newTeleportCard = Instantiate(_teleportCard, _deckHandParent.transform);
                     TeleportCard teleportCard = newTeleportCard.GetComponent<TeleportCard>();
+
                     teleportCard.Type = PlayableCardName.Teleport;
                     teleportCard.Board = board;
                     teleportCard.Grid = grid;
@@ -223,28 +191,9 @@ namespace Hexen.GameSystem
 
         private void Select(ICard<HexTile> card, HexTile hexTile)
             => _gameStateMachine.CurrentState.Select(card, hexTile);
-        // {
-        //     if (card.Type == PlayableCardName.Teleport && card.Positions(hexTile).Contains(hexTile))
-        //     {
-        //         _selectionManager.Select(hexTile);
-        //     }
-        //     else
-        //     {
-        //         foreach (var validHexTile in card.Positions(hexTile))
-        //         {
-        //             _selectionManager.Select(validHexTile);
-        //         }
-        //     }
-        // }
 
         private void Deselect(ICard<HexTile> card, HexTile hexTile)
             => _gameStateMachine.CurrentState.Deselect(card, hexTile);
-        // {
-        //     foreach (var validHexTile in card.Positions(hexTile))
-        //     {
-        //         _selectionManager.Deselect(validHexTile);
-        //     }
-        // }
 
         private void Play(ICard<HexTile> card, HexTile hexTile)
             => _gameStateMachine.CurrentState.Play(card, hexTile);

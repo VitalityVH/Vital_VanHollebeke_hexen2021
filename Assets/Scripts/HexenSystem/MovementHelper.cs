@@ -24,28 +24,6 @@ namespace Hexen.HexenSystem
             _board = board;
             _grid = grid;
         }
-
-        public MovementHelper<TPosition> Left(int maxSteps = int.MaxValue, params Validator[] validators)
-            => Collect(-1, 0, maxSteps, validators);
-
-        public MovementHelper<TPosition> TopLeft(int maxSteps = int.MaxValue, params Validator[] validators)
-            => Collect(0, -1, maxSteps, validators);
-
-        public MovementHelper<TPosition> BottomLeft(int maxSteps = int.MaxValue, params Validator[] validators)
-            => Collect(-1, +1, maxSteps, validators);
-
-        public MovementHelper<TPosition> Right(int maxSteps = int.MaxValue, params Validator[] validators)
-            => Collect(1, 0, maxSteps, validators);
-
-        public MovementHelper<TPosition> TopRight(int maxSteps = int.MaxValue, params Validator[] validators)
-            => Collect(1, -1, maxSteps, validators);
-
-        public MovementHelper<TPosition> BottomRight(int maxSteps = int.MaxValue, params Validator[] validators)
-            => Collect(0, 1, maxSteps, validators);
-        
-
-
-
         public MovementHelper<TPosition> Collect(int xOffset, int yOffset, int maxSteps = int.MaxValue, params Validator[] validators)
         {
             if (!_board.TryGetPosition(_board.HeroCapsule, out var currentPosition))
@@ -106,10 +84,6 @@ namespace Hexen.HexenSystem
 
         public static bool Empty(Board<Capsule<TPosition>, TPosition> board, Grid<TPosition> grid, Capsule<TPosition> capsule, TPosition toPosition)
             => !board.TryGetCapsule(toPosition, out var _);
-
-        public static bool ContainsEnemy(Board<Capsule<TPosition>, TPosition> board, Grid<TPosition> grid, Capsule<TPosition> capsule,
-            TPosition toPosition)
-            => board.TryGetCapsule(toPosition, out var toCapsule) && toCapsule.CapsuleType == CapsuleType.Enemy;
-
+        
     }
 }
