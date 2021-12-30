@@ -15,7 +15,6 @@ namespace Hexen.GameSystem.Cards
         #region Properties
         public Board<Capsule<HexTile>, HexTile> Board { get; set; }
         public Grid<HexTile> Grid { get; set; }
-        public ReplayManager ReplayManager { get; set; }
         public PlayableCardName Type { get; set; }
 
         #endregion
@@ -43,11 +42,14 @@ namespace Hexen.GameSystem.Cards
             return Positions(atPosition).Contains(atPosition);
         }
 
-        public void Execute(HexTile atPosition)
+        public void Execute(HexTile atPosition, out Action forward, out Action backward)
         {
+            forward = null;
+            backward = null;
+
             var hitCapsules = new Dictionary<Capsule<HexTile>, HexTile>();
 
-            Action forward = () =>
+            forward = () =>
             {
                 hitCapsules.Clear();
 
@@ -62,7 +64,7 @@ namespace Hexen.GameSystem.Cards
                 }
             };
 
-            Action backward = () =>
+            backward = () =>
             {
                 foreach (var capsule in hitCapsules)
                 {
@@ -70,11 +72,9 @@ namespace Hexen.GameSystem.Cards
                     Board.Place(capsule.Key, capsule.Value);
                 }
             };
-
-            ReplayManager.Execute(new DelegateReplayCommand(forward, backward));
         }
 
-        private int mod(int x, int m) => (x%m + m)%m;
+        private static int Mod(int x, int m) => (x%m + m)%m;
         public List<HexTile> Positions(HexTile hoveredTile)
         {
             List<HexTile> completeList = new List<HexTile>();
@@ -87,11 +87,11 @@ namespace Hexen.GameSystem.Cards
                 {
                     completeList.Clear();
 
-                    completeList.AddRange(new MovementHelper<HexTile>(Board, Grid).Collect(MovementHelper<HexTile>.Offsets[mod((i - 1), 6)].x,
-                        MovementHelper<HexTile>.Offsets[mod((i - 1), 6)].y, 1).CollectValidPositions());
+                    completeList.AddRange(new MovementHelper<HexTile>(Board, Grid).Collect(MovementHelper<HexTile>.Offsets[Mod((i - 1), 6)].x,
+                        MovementHelper<HexTile>.Offsets[Mod((i - 1), 6)].y, 1).CollectValidPositions());
                     completeList.AddRange(list);
-                    completeList.AddRange(new MovementHelper<HexTile>(Board, Grid).Collect(MovementHelper<HexTile>.Offsets[mod((i + 1), 6)].x,
-                        MovementHelper<HexTile>.Offsets[mod((i + 1), 6)].y, 1).CollectValidPositions());
+                    completeList.AddRange(new MovementHelper<HexTile>(Board, Grid).Collect(MovementHelper<HexTile>.Offsets[Mod((i + 1), 6)].x,
+                        MovementHelper<HexTile>.Offsets[Mod((i + 1), 6)].y, 1).CollectValidPositions());
 
                     return completeList;
                 }
@@ -102,9 +102,8 @@ namespace Hexen.GameSystem.Cards
             }
             return completeList;
         }
-        public void ActivateLayoutGroup()
-        {
-            GetComponentInParent<HorizontalLayoutGroup>().enabled = true;
-        }
+        public void ResetCard() => gameObject.GetComponent<CardBase>().ResetCard();
+        public void Fade() => gameObject.GetComponent<CardBase>().Fade();
+        
     }
 }

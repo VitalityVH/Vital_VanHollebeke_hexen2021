@@ -16,7 +16,6 @@ namespace Hexen.GameSystem.Cards
         #region Properties
         public Board<Capsule<HexTile>, HexTile> Board { get; set; }
         public Grid<HexTile> Grid { get; set; }
-        public ReplayManager ReplayManager { get; set; }
         public PlayableCardName Type { get; set; }
         #endregion
         
@@ -43,11 +42,13 @@ namespace Hexen.GameSystem.Cards
             return Positions(atPosition).Contains(atPosition);
         }
 
-        public void Execute(HexTile atPosition)
+        public void Execute(HexTile atPosition, out Action forward, out Action backward)
         {
+            forward = null;
+            backward = null;
             var hitCapsules = new Dictionary<Capsule<HexTile>, HexTile>();
 
-            Action forward = () =>
+            forward = () =>
             {
                 hitCapsules.Clear();
 
@@ -62,7 +63,7 @@ namespace Hexen.GameSystem.Cards
                 }
             };
 
-            Action backward = () =>
+            backward = () =>
             {
                 foreach (var capsule in hitCapsules)
                 {
@@ -70,8 +71,6 @@ namespace Hexen.GameSystem.Cards
                     Board.Place(capsule.Key, capsule.Value);
                 }
             };
-
-            ReplayManager.Execute(new DelegateReplayCommand(forward, backward));
         }
 
         public List<HexTile> Positions(HexTile hoveredTile)
@@ -90,9 +89,13 @@ namespace Hexen.GameSystem.Cards
             return completeList;
         }
 
-        public void ActivateLayoutGroup()
+        public void ResetCard()
         {
-            GetComponentInParent<HorizontalLayoutGroup>().enabled = true;
+            gameObject.GetComponent<CardBase>().ResetCard();
+        }
+        public void Fade()
+        {
+            gameObject.GetComponent<CardBase>().Fade();
         }
     }
 }

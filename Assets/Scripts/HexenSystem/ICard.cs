@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Hexen.HexenSystem.PlayableCards;
 
 namespace Hexen.HexenSystem
@@ -8,8 +9,9 @@ namespace Hexen.HexenSystem
         public PlayableCardName Type { get; set; }
         void SetActive(bool active);
         bool CanExecute(TPosition atPosition);
-        void Execute(TPosition atPosition);
-        void ActivateLayoutGroup();
+        void Execute(TPosition atPosition, out Action forward, out Action backward);
+        void ResetCard();
+        void Fade();
         List<TPosition> Positions(TPosition atPosition);
     }
 }

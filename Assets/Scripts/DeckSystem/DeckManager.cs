@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Hexen.HexenSystem;
+using Hexen.ReplaySystem;
+using UnityEngine;
 
 namespace Hexen.DeckSystem
 {
@@ -18,37 +20,34 @@ namespace Hexen.DeckSystem
         where TCard : ICard<TPosition>
     {
         private List<TCard> _cards = new List<TCard>();
+        private ICard<TPosition> _lastPlayed;
 
+        private ReplayManager _replayManager;
         private int _handSize = 5;
-
-        public EventHandler<CardEventArgs<TCard>> PlayCard;
-
+        public DeckManager(ReplayManager replayManager)
+        {
+            _replayManager = replayManager;
+        }
         public void Register(TCard card)
         {
             card.SetActive(false);
             _cards.Add(card);
         }
-
-        public void FillHand()
+        
+        public void FillHand(out TCard lastDrawnCard)
         {
-            if (_cards.Count > _handSize)
+            lastDrawnCard = default;
+            if (_cards.Count <= _handSize) return;
+
+            for (int i = 0; i < _handSize; i++)
             {
-                for (int i = 0; i < _handSize; i++)
+                if (_cards.Count > 0)
                 {
-                    if (_cards.Count > 0)
-                    {
-                        Activate(_cards[i]);
-                    }
+                    _cards[i].SetActive(true);
+                    lastDrawnCard = _cards[i];
                 }
             }
-            
         }
-
-        private void Activate(TCard card)
-        {
-            card.SetActive(true);
-        }
-
         public void Play(TCard card, TPosition position)
         {
             if (!_cards.Remove(card))
@@ -57,15 +56,36 @@ namespace Hexen.DeckSystem
             if (!card.CanExecute(position))
                 return;
 
-            card.Execute(position);
-            OnPlay(new CardEventArgs<TCard>(card));
-        }
+            card.Execute(position, out var forward, out var backward);
+            card.ResetCard();
 
+            FillHand(out var newCard);
 
-        protected virtual void OnPlay(CardEventArgs<TCard> eventArgs)
-        {
-            var handler = PlayCard;
-            handler?.Invoke(this, eventArgs);
+            forward += () =>
+            {
+                card.SetActive(false);
+
+                if (_cards.Contains(card))
+                    _cards.Remove(card);
+
+                if (_cards.Contains(newCard))
+                    newCard.SetActive(true);
+
+            };
+
+            backward += () =>
+            {
+                _cards.Add(card);
+                if (_cards.Contains(newCard))
+                    newCard.SetActive(false);
+
+                card.Fade();
+                card.SetActive(true);
+            };
+
+            _replayManager.Execute(new DelegateReplayCommand(forward, backward));
         }
+        
+
     }
 }

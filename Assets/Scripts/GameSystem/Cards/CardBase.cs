@@ -36,18 +36,24 @@ namespace Hexen.GameSystem.Cards
             GetComponentInParent<HorizontalLayoutGroup>().enabled = false;
         }
 
-        public void OnEndDrag(PointerEventData eventData)
+        public void OnEndDrag(PointerEventData eventData) => ResetCard();
+        
+
+        public void ResetCard()
         {
             _canvasGroup.alpha = 1;
             _canvasGroup.blocksRaycasts = true;
             this.transform.position = _origin;
             GetComponentInParent<HorizontalLayoutGroup>().enabled = true;
         }
-
-        public void OnDrag(PointerEventData eventData)
+        
+        public void Fade()
         {
-            _rectTransform.anchoredPosition += eventData.delta / _canvas.scaleFactor;
+            _canvasGroup.blocksRaycasts = false;
+            _canvasGroup.alpha = .6f;
         }
+
+        public void OnDrag(PointerEventData eventData) => _rectTransform.anchoredPosition += eventData.delta / _canvas.scaleFactor;
 
         #endregion
     }

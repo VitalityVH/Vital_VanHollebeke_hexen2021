@@ -16,7 +16,6 @@ namespace Hexen.GameSystem.Cards
         #region Properties
         public Board<Capsule<HexTile>, HexTile> Board { get; set; }
         public Grid<HexTile> Grid { get; set; }
-        public ReplayManager ReplayManager { get; set; }
 
         public PlayableCardName Type { get; set; }
 
@@ -47,24 +46,25 @@ namespace Hexen.GameSystem.Cards
             return Positions(atPosition).Contains(atPosition);
         }
 
-        public void Execute(HexTile atPosition)
+        public void Execute(HexTile atPosition, out Action forward, out Action backward)
         {
+            forward = null;
+            backward = null;
+
             if (!Board.TryGetPosition(Board.HeroCapsule, out var oldPos))
                 return;
 
-            Action forward = () =>
+            forward = () =>
             {
                 Board.Teleport(atPosition);
                 Board.HeroCapsule.TeleportTo(atPosition);
             };
 
-            Action backward = () =>
+            backward = () =>
             {
                 Board.Teleport(oldPos);
                 Board.HeroCapsule.TeleportTo(oldPos);
             };
-
-            ReplayManager.Execute(new DelegateReplayCommand(forward, backward));
         }
 
         public List<HexTile> Positions(HexTile pos)
@@ -74,10 +74,9 @@ namespace Hexen.GameSystem.Cards
                 .CollectValidPositions();
         }
 
-        public void ActivateLayoutGroup()
-        {
-            GetComponentInParent<HorizontalLayoutGroup>().enabled = true;
-        }
+        public void ResetCard()=>gameObject.GetComponent<CardBase>().ResetCard();
+        public void Fade()=> gameObject.GetComponent<CardBase>().Fade();
+        
     }
 
 }

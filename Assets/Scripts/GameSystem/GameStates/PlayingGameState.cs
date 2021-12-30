@@ -1,4 +1,5 @@
-﻿using Hexen.BoardSystem;
+﻿using System;
+using Hexen.BoardSystem;
 using Hexen.DeckSystem;
 using Hexen.HexenSystem;
 using Hexen.HexenSystem.PlayableCards;
@@ -11,46 +12,34 @@ namespace Hexen.GameSystem.GameStates
 {
     class PlayingGameState : GameStateBase
     {
-        private Board<Capsule<HexTile>, HexTile> _board;
-        private Grid<HexTile> _grid;
-
         private SelectionManager<HexTile> _selectionManager;
         private DeckManager<ICard<HexTile>, HexTile> _deckManager;
 
         public PlayingGameState(StateMachine<GameStateBase> stateMachine, Board<Capsule<HexTile>, HexTile> board,
-            Grid<HexTile> grid, DeckManager<ICard<HexTile>, HexTile> deckManager, ReplayManager replayManager) : base(stateMachine)
+            Grid<HexTile> grid, DeckManager<ICard<HexTile>, HexTile> deckManager) : base(stateMachine)
         {
-            _board = board;
-            _grid = grid;
             _selectionManager = new SelectionManager<HexTile>();
             _deckManager = deckManager;
         }
 
         public override void OnEnter()
         {
-            _deckManager.PlayCard += OnCardPlayed;
             _selectionManager.Selected += OnHexTileSelected;
             _selectionManager.Deselected += OnHexTileDeselected;
         }
 
         public override void OnExit()
         {
-            _deckManager.PlayCard -= OnCardPlayed;
             _selectionManager.Selected -= OnHexTileSelected;
             _selectionManager.Deselected -= OnHexTileDeselected;
         }
 
-        private void DeselectAll()
-        {
-            _selectionManager.DeselectAll();
-        }
+        private void DeselectAll() => _selectionManager.DeselectAll();
 
         public override void Deselect(ICard<HexTile> card, HexTile hexTile)
         {
             foreach (var validHexTile in card.Positions(hexTile))
-            {
                 _selectionManager.Deselect(validHexTile);
-            }
         }
 
         public override void Select(ICard<HexTile> card, HexTile hexTile)
@@ -74,34 +63,13 @@ namespace Hexen.GameSystem.GameStates
             {
                 _deckManager.Play(eventArgsCard, eventArgsHexTile);
             }
-            else
-            {
-                DeselectAll();
-            }
-                
-        }
 
-        public override void Backward()
-        {
-            StateMachine.MoveTo(ReplayingState);
-        }
-
-        private void OnCardPlayed(object source, CardEventArgs<ICard<HexTile>> card)
-        {
             DeselectAll();
-            card.Card.ActivateLayoutGroup();
-            card.Card.SetActive(false);
-            _deckManager.FillHand();
         }
 
-        private void OnHexTileDeselected(object source, SelectionEventArgs<HexTile> eventArgs)
-        {
-            eventArgs.SelectionItem.Highlight = false;
-        }
-
-        private void OnHexTileSelected(object source, SelectionEventArgs<HexTile> eventArgs)
-        {
-            eventArgs.SelectionItem.Highlight = true;
-        }
+        public override void Backward() => StateMachine.MoveTo(ReplayingState);
+        private void OnHexTileDeselected(object source, SelectionEventArgs<HexTile> eventArgs) => eventArgs.SelectionItem.Highlight = false;
+        private void OnHexTileSelected(object source, SelectionEventArgs<HexTile> eventArgs) => eventArgs.SelectionItem.Highlight = true;
+        
     }
 }

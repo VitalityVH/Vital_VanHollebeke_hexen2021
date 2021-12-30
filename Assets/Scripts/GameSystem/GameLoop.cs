@@ -47,20 +47,19 @@ namespace Hexen.GameSystem
         {
             var grid = new Grid<HexTile>(_fieldRadius);
             var board = new Board<Capsule<HexTile>, HexTile>();
-            var deckManager = new DeckManager<ICard<HexTile>, HexTile>();
-
             var replayManager = new ReplayManager();
+            var deckManager = new DeckManager<ICard<HexTile>, HexTile>(replayManager);
 
             _gameStateMachine = new StateMachine<GameStateBase>();
 
-            _gameStateMachine.Register(GameStateBase.PlayingState, new PlayingGameState(_gameStateMachine, board, grid, deckManager, replayManager));
+            _gameStateMachine.Register(GameStateBase.PlayingState, new PlayingGameState(_gameStateMachine, board, grid, deckManager));
             _gameStateMachine.Register(GameStateBase.ReplayingState, new ReplayGameState(_gameStateMachine, replayManager));
             _gameStateMachine.InitialState = GameStateBase.PlayingState;
 
             GenerateGrid(grid);
             GenerateHero(board, grid);
             GenerateEnemies(board, grid);
-            PopulateDeck(board, grid, deckManager, replayManager);
+            PopulateDeck(board, grid, deckManager);
             PopulateHand(deckManager);
 
         }
@@ -134,14 +133,14 @@ namespace Hexen.GameSystem
                 }
             }
         }
-        private void PopulateDeck(Board<Capsule<HexTile>, HexTile> board, Grid<HexTile> grid, DeckManager<ICard<HexTile>, HexTile> deckManager, ReplayManager replayManager)
+        private void PopulateDeck(Board<Capsule<HexTile>, HexTile> board, Grid<HexTile> grid, DeckManager<ICard<HexTile>, HexTile> deckManager)
         {
             for (int i = 0; i < _deckSize; i++)
             {
-                GenerateCard(board, grid, deckManager, replayManager);
+                GenerateCard(board, grid, deckManager);
             }
         }
-        private void GenerateCard(Board<Capsule<HexTile>, HexTile> board, Grid<HexTile> grid, DeckManager<ICard<HexTile>, HexTile> deckManager, ReplayManager replayManager)
+        private void GenerateCard(Board<Capsule<HexTile>, HexTile> board, Grid<HexTile> grid, DeckManager<ICard<HexTile>, HexTile> deckManager)
         {
             switch (Random.Range(1, 5))
             {
@@ -152,7 +151,6 @@ namespace Hexen.GameSystem
                     teleportCard.Type = PlayableCardName.Teleport;
                     teleportCard.Board = board;
                     teleportCard.Grid = grid;
-                    teleportCard.ReplayManager = replayManager;
                     deckManager.Register(teleportCard);
                     break;
                 case 2:
@@ -161,7 +159,6 @@ namespace Hexen.GameSystem
                     slashCard.Type = PlayableCardName.Slash;
                     slashCard.Board = board;
                     slashCard.Grid = grid;
-                    slashCard.ReplayManager = replayManager;
                     deckManager.Register(slashCard);
                     break;
                 case 3:
@@ -170,7 +167,6 @@ namespace Hexen.GameSystem
                     swipeCard.Type = PlayableCardName.Swipe;
                     swipeCard.Board = board;
                     swipeCard.Grid = grid;
-                    swipeCard.ReplayManager = replayManager;
                     deckManager.Register(swipeCard);
                     break;
                 case 4:
@@ -179,14 +175,13 @@ namespace Hexen.GameSystem
                     pushCard.Type = PlayableCardName.Pushback;
                     pushCard.Board = board;
                     pushCard.Grid = grid;
-                    pushCard.ReplayManager = replayManager;
                     deckManager.Register(pushCard);
                     break;
             }
         }
         private void PopulateHand(DeckManager<ICard<HexTile>, HexTile> deckManager)
         {
-            deckManager.FillHand();
+            deckManager.FillHand(out _);
         }
 
         private void Select(ICard<HexTile> card, HexTile hexTile)
@@ -197,7 +192,6 @@ namespace Hexen.GameSystem
 
         private void Play(ICard<HexTile> card, HexTile hexTile)
             => _gameStateMachine.CurrentState.Play(card, hexTile);
-
 
         public void Backward()
             => _gameStateMachine.CurrentState.Backward();

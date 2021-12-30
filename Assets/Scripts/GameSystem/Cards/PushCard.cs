@@ -16,7 +16,6 @@ namespace Hexen.GameSystem.Cards
         public Board<Capsule<HexTile>, HexTile> Board { get; set; }
         public Grid<HexTile> Grid { get; set; }
         public PlayableCardName Type { get; set; }
-        public ReplayManager ReplayManager { get; set; }
         #endregion
 
         #region Fields
@@ -41,13 +40,16 @@ namespace Hexen.GameSystem.Cards
             return Positions(atPosition).Contains(atPosition);
         }
 
-        public void Execute(HexTile atPosition)
+        public void Execute(HexTile atPosition, out Action forward, out Action backward)
         {
+            forward = null;
+            backward = null;
+
             var hitCapsules = new Dictionary<Capsule<HexTile>, HexTile>();
             var pushedCapsuleOldPositions = new Dictionary<Capsule<HexTile>, HexTile>();
             var pushedCapsuleNewPositions = new Dictionary<Capsule<HexTile>, HexTile>();
 
-            Action forward = () =>
+            forward = () =>
             {
                 hitCapsules.Clear();
                 pushedCapsuleOldPositions.Clear();
@@ -55,41 +57,40 @@ namespace Hexen.GameSystem.Cards
 
                 foreach (var hexTile in Positions(atPosition))
                 {
-                    if (Board.TryGetCapsule(hexTile, out var capsule))
+                    if (!Board.TryGetCapsule(hexTile, out var capsule)) continue;
+
+                    Grid.TryGetCoordinateAt(hexTile, out var hexCoordinate);
+                    Board.TryGetPosition(Board.HeroCapsule, out var heroHex);
+
+                    Grid.TryGetCoordinateAt(heroHex, out var heroHexCoordinate);
+
+                    (float x, float y) offSet = (hexCoordinate.x - heroHexCoordinate.x,
+                        hexCoordinate.y - heroHexCoordinate.y);
+
+                    Grid.TryGetPositionAt(hexCoordinate.x + offSet.x, hexCoordinate.y + offSet.y,
+                        out var targetHexTile);
+
+                    if (Grid.HexPositions.ContainsKey(targetHexTile)) //if there is a tile behind the pushed enemy
                     {
-                        Grid.TryGetCoordinateAt(hexTile, out var hexCoordinate);
-                        Board.TryGetPosition(Board.HeroCapsule, out var heroHex);
-
-                        Grid.TryGetCoordinateAt(heroHex, out var heroHexCoordinate);
-
-                        (float x, float y) offSet = (hexCoordinate.x - heroHexCoordinate.x,
-                            hexCoordinate.y - heroHexCoordinate.y);
-
-                        Grid.TryGetPositionAt(hexCoordinate.x + offSet.x, hexCoordinate.y + offSet.y,
-                            out var targetHexTile);
-
-                        if (Grid.HexPositions.ContainsKey(targetHexTile)) //if there is a tile behind the pushed enemy
+                        if (!Board.TryGetCapsule(targetHexTile, out _)) //and if there is no enemy behind
                         {
-                            if (!Board.TryGetCapsule(targetHexTile, out _)) //and if there is no enemy behind
-                            {
-                                pushedCapsuleOldPositions.Add(capsule, hexTile);
-                                pushedCapsuleNewPositions.Add(capsule, targetHexTile);
+                            pushedCapsuleOldPositions.Add(capsule, hexTile);
+                            pushedCapsuleNewPositions.Add(capsule, targetHexTile);
 
-                                Board.Push(capsule, targetHexTile);
-                                capsule.PushedTo(targetHexTile);
-                            }
+                            Board.Push(capsule, targetHexTile);
+                            capsule.PushedTo(targetHexTile);
                         }
-                        else //hit
-                        {
-                            hitCapsules.Add(capsule, hexTile);
-                            Board.Hit(capsule);
-                            capsule.HitFrom(hexTile);
-                        }
+                    }
+                    else //hit
+                    {
+                        hitCapsules.Add(capsule, hexTile);
+                        Board.Hit(capsule);
+                        capsule.HitFrom(hexTile);
                     }
                 }
             };
 
-            Action backward = () =>
+            backward = () =>
             {
                 foreach (var capsule in hitCapsules)
                 {
@@ -103,10 +104,8 @@ namespace Hexen.GameSystem.Cards
                     capsule.Key.PushedTo(capsule.Value);
                 }
             };
-
-            ReplayManager.Execute(new DelegateReplayCommand(forward, backward));
         }
-        private int mod(int x, int m) => (x % m + m) % m;
+        private static int Mod(int x, int m) => (x % m + m) % m;
         public List<HexTile> Positions(HexTile hoveredTile)
         {
             List<HexTile> completeList = new List<HexTile>();
@@ -119,11 +118,11 @@ namespace Hexen.GameSystem.Cards
                 {
                     completeList.Clear();
 
-                    completeList.AddRange(new MovementHelper<HexTile>(Board, Grid).Collect(MovementHelper<HexTile>.Offsets[mod((i - 1), 6)].x,
-                        MovementHelper<HexTile>.Offsets[mod((i - 1), 6)].y, 1).CollectValidPositions());
+                    completeList.AddRange(new MovementHelper<HexTile>(Board, Grid).Collect(MovementHelper<HexTile>.Offsets[Mod((i - 1), 6)].x,
+                        MovementHelper<HexTile>.Offsets[Mod((i - 1), 6)].y, 1).CollectValidPositions());
                     completeList.AddRange(list);
-                    completeList.AddRange(new MovementHelper<HexTile>(Board, Grid).Collect(MovementHelper<HexTile>.Offsets[mod((i + 1), 6)].x,
-                        MovementHelper<HexTile>.Offsets[mod((i + 1), 6)].y, 1).CollectValidPositions());
+                    completeList.AddRange(new MovementHelper<HexTile>(Board, Grid).Collect(MovementHelper<HexTile>.Offsets[Mod((i + 1), 6)].x,
+                        MovementHelper<HexTile>.Offsets[Mod((i + 1), 6)].y, 1).CollectValidPositions());
 
                     return completeList;
                 }
@@ -134,9 +133,8 @@ namespace Hexen.GameSystem.Cards
             }
             return completeList;
         }
-        public void ActivateLayoutGroup()
-        {
-            GetComponentInParent<HorizontalLayoutGroup>().enabled = true;
-        }
+        public void ResetCard() => gameObject.GetComponent<CardBase>().ResetCard();
+        public void Fade() => gameObject.GetComponent<CardBase>().Fade();
+        
     }
 }
