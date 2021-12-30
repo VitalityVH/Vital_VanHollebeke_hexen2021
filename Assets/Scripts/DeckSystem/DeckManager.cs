@@ -24,16 +24,12 @@ namespace Hexen.DeckSystem
 
         private ReplayManager _replayManager;
         private int _handSize = 5;
-        public DeckManager(ReplayManager replayManager)
-        {
-            _replayManager = replayManager;
-        }
+        public DeckManager(ReplayManager replayManager) => _replayManager = replayManager;
         public void Register(TCard card)
         {
             card.SetActive(false);
             _cards.Add(card);
         }
-        
         public void FillHand(out TCard lastDrawnCard)
         {
             lastDrawnCard = default;
@@ -56,7 +52,7 @@ namespace Hexen.DeckSystem
             if (!card.CanExecute(position))
                 return;
 
-            card.Execute(position, out var forward, out var backward);
+            card.Execute(position, out Action forward, out Action backward);
             card.ResetCard();
 
             FillHand(out var newCard);
