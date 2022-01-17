@@ -149,7 +149,7 @@ namespace Hexen.GameSystem
         }
         private void GenerateCard(Board<Capsule<HexTile>, HexTile> board, Grid<HexTile> grid, DeckManager<ICard<HexTile>, HexTile> deckManager)
         {
-            switch (Random.Range(4, 6))
+            switch (Random.Range(1, 6))
             {
                 case 1:
                     var newTeleportCard = Instantiate(_teleportCard, _deckHandParent.transform);

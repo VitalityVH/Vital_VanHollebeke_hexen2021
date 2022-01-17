@@ -68,11 +68,13 @@ namespace Hexen.GameSystem.GameStates
         {
             foreach (var hextile in eventArgsCard.Positions(eventArgsHexTile))
             {
-                if (eventArgsCard.Type == PlayableCardName.Bomb && hextile == _board.HeroCapsule.HexTile)
+                _board.TryGetPosition(_board.HeroCapsule, out var heroPos);
+                if (eventArgsCard.Type == PlayableCardName.Bomb && hextile == heroPos)
                 {
                     HeroHit();
                 }
             }
+
             if (eventArgsCard.Positions(eventArgsHexTile).Contains(eventArgsHexTile))
             {
                 _deckManager.Play(eventArgsCard, eventArgsHexTile);
