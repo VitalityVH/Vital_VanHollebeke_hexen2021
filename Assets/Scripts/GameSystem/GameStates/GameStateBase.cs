@@ -7,6 +7,8 @@ namespace Hexen.GameSystem.GameStates
     {
         public const string PlayingState = "playing";
         public const string ReplayingState = "replaying";
+        public const string StartScreenState = "starting";
+        public const string EndScreenState = "ending";
 
         public StateMachine<GameStateBase> StateMachine => _stateMachine;
 
@@ -23,6 +25,5 @@ namespace Hexen.GameSystem.GameStates
         public virtual void Select(ICard<HexTile> card, HexTile hexTile) { }
         public virtual void Deselect(ICard<HexTile> card, HexTile hexTile) { }
         public virtual void Play(ICard<HexTile> card, HexTile hexTile) { }
-
     }
 }

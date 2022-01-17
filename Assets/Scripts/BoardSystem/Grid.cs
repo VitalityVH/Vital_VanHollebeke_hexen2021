@@ -42,6 +42,12 @@ namespace Hexen.BoardSystem
             HexPositions.Add(hexTile, (x,y));
         }
 
+        public void Remove(THexTile hexTile)
+        {
+            if (!HexPositions.Remove(hexTile))
+                return;
+        }
+
         public BidirectionalDictionary<THexTile, (float xPos, float yPos)> AllHexPositions()
         {
             return HexPositions;

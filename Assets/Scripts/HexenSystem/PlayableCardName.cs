@@ -2,6 +2,6 @@
 {
     public enum PlayableCardName
     {
-        Teleport, Slash, Swipe, Pushback
+        Teleport, Slash, Swipe, Pushback, Bomb
     }
 }

@@ -59,7 +59,6 @@ namespace Hexen.GameSystem
 
         [SerializeField] private UnityEvent OnActivate;
         [SerializeField] private UnityEvent OnDeactivate;
-
         public bool Highlight
         {
             set
@@ -86,8 +85,19 @@ namespace Hexen.GameSystem
 
         #endregion
 
+        public void Hide()
+        {
+            if (this.gameObject != null)
+                this.gameObject.SetActive(false);
+        }
+
+        public void Unhide()
+        {
+            if (this.gameObject != null)
+                this.gameObject.SetActive(true);
+        }
         #region Coordinate Arithmetic Methods
-        
+
         public HexTile Add(HexTile hex, HexTile hexAdd)
         {
             HexTile newHex = hex;

@@ -25,8 +25,12 @@ namespace Hexen.GameSystem
         [SerializeField] private GameObject _enemyModel;
         [SerializeField] private GameObject _heroModel;
 
+        [SerializeField] private GameObject _startScreen;
+        [SerializeField] private GameObject _endScreen;
+
         [SerializeField] private GameObject _deckHandParent;
 
+        [SerializeField] private GameObject _bombCard;
         [SerializeField] private GameObject _teleportCard;
         [SerializeField] private GameObject _swipeCard;
         [SerializeField] private GameObject _slashCard;
@@ -51,10 +55,13 @@ namespace Hexen.GameSystem
             var deckManager = new DeckManager<ICard<HexTile>, HexTile>(replayManager);
 
             _gameStateMachine = new StateMachine<GameStateBase>();
+            _gameStateMachine.Register(GameStateBase.StartScreenState, new StartScreenGameState(_gameStateMachine, _startScreen));
+            _gameStateMachine.Register(GameStateBase.EndScreenState, new EndScreenGameState(_gameStateMachine, _endScreen));
 
             _gameStateMachine.Register(GameStateBase.PlayingState, new PlayingGameState(_gameStateMachine, board, grid, deckManager));
             _gameStateMachine.Register(GameStateBase.ReplayingState, new ReplayGameState(_gameStateMachine, replayManager));
-            _gameStateMachine.InitialState = GameStateBase.PlayingState;
+
+            _gameStateMachine.InitialState = GameStateBase.StartScreenState;
 
             GenerateGrid(grid);
             GenerateHero(board, grid);
@@ -142,17 +149,17 @@ namespace Hexen.GameSystem
         }
         private void GenerateCard(Board<Capsule<HexTile>, HexTile> board, Grid<HexTile> grid, DeckManager<ICard<HexTile>, HexTile> deckManager)
         {
-            switch (Random.Range(1, 5))
+            switch (Random.Range(4, 6))
             {
                 case 1:
                     var newTeleportCard = Instantiate(_teleportCard, _deckHandParent.transform);
                     TeleportCard teleportCard = newTeleportCard.GetComponent<TeleportCard>();
-
                     teleportCard.Type = PlayableCardName.Teleport;
                     teleportCard.Board = board;
                     teleportCard.Grid = grid;
                     deckManager.Register(teleportCard);
                     break;
+
                 case 2:
                     var newSlashCard = Instantiate(_slashCard, _deckHandParent.transform);
                     SlashCard slashCard = newSlashCard.GetComponent<SlashCard>();
@@ -161,6 +168,7 @@ namespace Hexen.GameSystem
                     slashCard.Grid = grid;
                     deckManager.Register(slashCard);
                     break;
+
                 case 3:
                     var newSwipeCard = Instantiate(_swipeCard, _deckHandParent.transform);
                     SwipeCard swipeCard = newSwipeCard.GetComponent<SwipeCard>();
@@ -169,6 +177,7 @@ namespace Hexen.GameSystem
                     swipeCard.Grid = grid;
                     deckManager.Register(swipeCard);
                     break;
+
                 case 4:
                     var newPushCard = Instantiate(_pushCard, _deckHandParent.transform);
                     PushCard pushCard = newPushCard.GetComponent<PushCard>();
@@ -176,6 +185,15 @@ namespace Hexen.GameSystem
                     pushCard.Board = board;
                     pushCard.Grid = grid;
                     deckManager.Register(pushCard);
+                    break;
+
+                case 5:
+                    var newBombCard = Instantiate(_bombCard, _deckHandParent.transform);
+                    BombCard bombCard = newBombCard.GetComponent<BombCard>();
+                    bombCard.Type = PlayableCardName.Bomb;
+                    bombCard.Board = board;
+                    bombCard.Grid = grid;
+                    deckManager.Register(bombCard);
                     break;
             }
         }

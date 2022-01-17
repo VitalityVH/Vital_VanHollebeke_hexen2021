@@ -16,7 +16,6 @@ namespace Hexen.HexenSystem
 
         private Board<Capsule<TPosition>, TPosition> _board;
         private Grid<TPosition> _grid;
-        private ICard<TPosition> _card;
         private List<TPosition> _validPositions = new List<TPosition>();
 
         public MovementHelper(Board<Capsule<TPosition>, TPosition> board, Grid<TPosition> grid)
@@ -54,6 +53,33 @@ namespace Hexen.HexenSystem
 
             return this;
         }
+
+        public MovementHelper<TPosition> CollectAtPosition(TPosition hexTile, int xOffset, int yOffset, int maxSteps = int.MaxValue, params Validator[] validators)
+        {
+            if (!_grid.TryGetCoordinateAt(hexTile, out var currentCoordinates))
+                return this;
+
+            var nextCoordinateX = currentCoordinates.x + xOffset;
+            var nextCoordinateY = currentCoordinates.y + yOffset;
+
+            _grid.TryGetPositionAt(nextCoordinateX, nextCoordinateY, out var nextHexTile);
+            var steps = 0;
+            
+            while (steps < maxSteps && nextHexTile != null && validators.All((v) => v(_board, _grid, _board.HeroCapsule, nextHexTile)))
+            {
+                _validPositions.Add(nextHexTile);
+
+                nextCoordinateX += xOffset;
+                nextCoordinateY += yOffset;
+
+                _grid.TryGetPositionAt(nextCoordinateX, nextCoordinateY, out nextHexTile);
+
+                steps++;
+            }
+
+            return this;
+        }
+
 
         public MovementHelper<TPosition> ReturnAllHexTiles(params Validator[] validators)
         {

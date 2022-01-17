@@ -34,7 +34,6 @@ namespace Hexen.BoardSystem
         {
             if (!_capsules.Remove(capsule))
                 return;
-
         }
 
         public void Push(TCapsule capsule, TPosition toPosition)

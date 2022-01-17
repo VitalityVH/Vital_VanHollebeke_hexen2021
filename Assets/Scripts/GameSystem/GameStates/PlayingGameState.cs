@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using Hexen.BoardSystem;
 using Hexen.DeckSystem;
 using Hexen.HexenSystem;
@@ -7,6 +8,7 @@ using Hexen.ReplaySystem;
 using Hexen.SelectionSystem;
 using Hexen.StateSystem;
 using UnityEditorInternal;
+using Debug = UnityEngine.Debug;
 
 namespace Hexen.GameSystem.GameStates
 {
@@ -14,10 +16,14 @@ namespace Hexen.GameSystem.GameStates
     {
         private SelectionManager<HexTile> _selectionManager;
         private DeckManager<ICard<HexTile>, HexTile> _deckManager;
+        private Board<Capsule<HexTile>, HexTile> _board;
+        private Grid<HexTile> _grid;
 
         public PlayingGameState(StateMachine<GameStateBase> stateMachine, Board<Capsule<HexTile>, HexTile> board,
             Grid<HexTile> grid, DeckManager<ICard<HexTile>, HexTile> deckManager) : base(stateMachine)
         {
+            _board = board;
+            _grid = grid;
             _selectionManager = new SelectionManager<HexTile>();
             _deckManager = deckManager;
         }
@@ -26,6 +32,7 @@ namespace Hexen.GameSystem.GameStates
         {
             _selectionManager.Selected += OnHexTileSelected;
             _selectionManager.Deselected += OnHexTileDeselected;
+
         }
 
         public override void OnExit()
@@ -59,17 +66,24 @@ namespace Hexen.GameSystem.GameStates
 
         public override void Play(ICard<HexTile> eventArgsCard, HexTile eventArgsHexTile)
         {
+            foreach (var hextile in eventArgsCard.Positions(eventArgsHexTile))
+            {
+                if (eventArgsCard.Type == PlayableCardName.Bomb && hextile == _board.HeroCapsule.HexTile)
+                {
+                    HeroHit();
+                }
+            }
             if (eventArgsCard.Positions(eventArgsHexTile).Contains(eventArgsHexTile))
             {
                 _deckManager.Play(eventArgsCard, eventArgsHexTile);
             }
-
             DeselectAll();
         }
 
         public override void Backward() => StateMachine.MoveTo(ReplayingState);
+        public void HeroHit() => StateMachine.MoveTo(EndScreenState);
         private void OnHexTileDeselected(object source, SelectionEventArgs<HexTile> eventArgs) => eventArgs.SelectionItem.Highlight = false;
         private void OnHexTileSelected(object source, SelectionEventArgs<HexTile> eventArgs) => eventArgs.SelectionItem.Highlight = true;
-        
+
     }
 }
