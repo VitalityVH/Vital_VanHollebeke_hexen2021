@@ -21,7 +21,7 @@ namespace Hexen.GameSystem.GameStates
         public virtual void OnEnter(){}
         public virtual void OnExit(){}
         public virtual void Forward(){}
-        public virtual void Backward() { }
+        public virtual void Backward() {} 
         public virtual void Select(ICard<HexTile> card, HexTile hexTile) { }
         public virtual void Deselect(ICard<HexTile> card, HexTile hexTile) { }
         public virtual void Play(ICard<HexTile> card, HexTile hexTile) { }

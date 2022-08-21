@@ -39,7 +39,6 @@ namespace Hexen.GameSystem.Cards
         {
             return Positions(atPosition).Contains(atPosition);
         }
-
         public void Execute(HexTile atPosition, out Action forward, out Action backward)
         {
             forward = null;
